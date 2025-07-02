@@ -165,12 +165,37 @@ console.log('OpenAI API Key:', process.env.OPENAI_API_KEY ? 'Set' : 'Not set');
 
 let gemini = null;
 let openai = null;
+let genAI = null;
 
 // Initialize Google Gemini (FREE)
 if (process.env.GEMINI_API_KEY) {
-  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-  gemini = genAI.getGenerativeModel({ model: "gemini-pro" });
-  console.log('✅ Google Gemini client initialized (FREE)');
+  genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+  
+  // Try different model names (Google updates these periodically)
+  const modelNames = [
+    "gemini-1.5-flash",
+    "gemini-1.5-pro", 
+    "gemini-pro",
+    "gemini-1.0-pro"
+  ];
+  
+  let modelFound = false;
+  for (const modelName of modelNames) {
+    try {
+      gemini = genAI.getGenerativeModel({ model: modelName });
+      console.log(`✅ Google Gemini client initialized (FREE) - using ${modelName}`);
+      modelFound = true;
+      break;
+    } catch (error) {
+      console.log(`⚠️ Model ${modelName} not available, trying next...`);
+      continue;
+    }
+  }
+  
+  if (!modelFound) {
+    console.log('❌ No Gemini model found, will try at runtime');
+    gemini = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); // Default fallback
+  }
 } else {
   console.log('⚠️ Google Gemini disabled (API key not provided)');
 }
@@ -187,7 +212,7 @@ if (process.env.OPENAI_API_KEY) {
 
 // Function to generate personalized AI content
 async function generatePersonalizedMessage(firstName, subjects, goals, experience, grade) {
-  if ((!gemini && !openai) || (!goals && !experience)) {
+  if ((!genAI && !openai) || (!goals && !experience)) {
     return null; // Return null to use default template
   }
 
@@ -207,17 +232,25 @@ The paragraph should:
 Write only the paragraph, no additional formatting.`;
 
   // Try Google Gemini first (FREE)
-  if (gemini) {
-    try {
-      console.log('🤖 Generating personalized message with Google Gemini (FREE)...');
-      const result = await gemini.generateContent(prompt);
-      const response = await result.response;
-      const text = response.text();
-      console.log('✅ Gemini generated personalized message');
-      return text.trim();
-    } catch (error) {
-      console.log('❌ Google Gemini error:', error.message);
-      console.log('🔄 Falling back to OpenAI...');
+  if (genAI) {
+    const modelNames = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro", "gemini-1.0-pro"];
+    
+    for (const modelName of modelNames) {
+      try {
+        console.log(`🤖 Generating personalized message with Google Gemini (${modelName})...`);
+        const model = genAI.getGenerativeModel({ model: modelName });
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text();
+        console.log(`✅ Gemini generated personalized message using ${modelName}`);
+        return text.trim();
+      } catch (error) {
+        console.log(`❌ Google Gemini error with ${modelName}:`, error.message);
+        if (modelName === modelNames[modelNames.length - 1]) {
+          console.log('🔄 All Gemini models failed, falling back to OpenAI...');
+        }
+        continue;
+      }
     }
   }
 
