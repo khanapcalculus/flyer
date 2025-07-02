@@ -99,6 +99,16 @@ const studentSchema = new mongoose.Schema({
     required: true,
     enum: ['6th', '7th', '8th', '9th', '10th', '11th', '12th', 'College', 'Graduate']
   },
+  country: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  timezone: {
+    type: String,
+    required: true,
+    trim: true
+  },
   subjects: [{
     type: String,
     enum: [
@@ -327,13 +337,13 @@ app.get('/flyer', (req, res) => {
 app.post('/api/register', async (req, res) => {
   try {
     const {
-      firstName, lastName, email, phone, grade, subjects,
+      firstName, lastName, email, phone, grade, country, timezone, subjects,
       preferredTimes, parentName, parentEmail, parentPhone,
       goals, experience
     } = req.body;
 
     // Validation
-    if (!firstName || !lastName || !email || !phone || !grade || !subjects) {
+    if (!firstName || !lastName || !email || !phone || !grade || !country || !timezone || !subjects) {
       return res.status(400).json({
         success: false,
         message: 'Please fill in all required fields'
@@ -356,6 +366,8 @@ app.post('/api/register', async (req, res) => {
       email: email.toLowerCase(),
       phone,
       grade,
+      country,
+      timezone,
       subjects,
       preferredTimes,
       parentName,
@@ -459,7 +471,10 @@ app.post('/api/register', async (req, res) => {
             <li><strong>Email:</strong> ${email}</li>
             <li><strong>Phone:</strong> ${phone}</li>
             <li><strong>Grade:</strong> ${grade}</li>
+            <li><strong>Country:</strong> ${country}</li>
+            <li><strong>Time Zone:</strong> ${timezone}</li>
             <li><strong>Subjects:</strong> ${subjects.join(', ')}</li>
+            ${preferredTimes.length > 0 ? `<li><strong>Preferred Schedule:</strong> ${preferredTimes.map(pref => `${pref.day}: ${pref.time}`).join(', ')}</li>` : ''}
             <li><strong>Goals:</strong> ${goals || 'Not specified'}</li>
             <li><strong>Experience:</strong> ${experience || 'Not specified'}</li>
           </ul>

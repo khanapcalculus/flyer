@@ -144,12 +144,51 @@
             color: white;
         }
 
-        .time-row {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
+        .schedule-grid {
+            display: flex;
+            flex-direction: column;
             gap: 15px;
-            margin-bottom: 15px;
+        }
+
+        .day-time-row {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            gap: 15px;
             align-items: center;
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid #e0e0e0;
+        }
+
+        .day-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .day-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #002147;
+        }
+
+        .day-checkbox label {
+            font-weight: 600;
+            margin: 0;
+            cursor: pointer;
+            color: #333;
+        }
+
+        .time-input:disabled {
+            background-color: #f5f5f5;
+            color: #999;
+            cursor: not-allowed;
+        }
+
+        .time-input:enabled {
+            background-color: white;
+            border: 2px solid #002147;
         }
 
         .btn {
@@ -220,10 +259,18 @@
         }
 
         .alert-success {
-            background: #d4edda;
+            background: linear-gradient(135deg, #d4f6da 0%, #c3e6cb 100%);
             color: #155724;
-            border: 1px solid #c3e6cb;
-            box-shadow: 0 8px 32px rgba(21, 87, 36, 0.2);
+            border: 2px solid #28a745;
+            box-shadow: 0 8px 32px rgba(21, 87, 36, 0.3);
+            font-size: 18px;
+            animation: successPulse 0.5s ease-in-out;
+        }
+        
+        @keyframes successPulse {
+            0% { transform: scale(0.95); opacity: 0; }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); opacity: 1; }
         }
 
         .alert-error {
@@ -263,8 +310,13 @@
                 padding: 20px 20px 40px 20px;
             }
             
-            .time-row {
+            .day-time-row {
                 grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .day-checkbox {
+                justify-content: center;
             }
 
             body {
@@ -320,7 +372,7 @@
                         </div>
                         <div class="form-group">
                             <label for="phone">Phone Number <span class="required">*</span></label>
-                            <input type="tel" id="phone" name="phone" class="form-control" placeholder="e.g., 714-400-8283" required>
+                            <input type="tel" id="phone" name="phone" class="form-control" placeholder="e.g., +1-714-400-8283 or 714-400-8283" required>
                         </div>
                     </div>
 
@@ -338,6 +390,121 @@
                             <option value="College">College</option>
                             <option value="Graduate">Graduate School</option>
                         </select>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="country">Country <span class="required">*</span></label>
+                            <select id="country" name="country" class="form-control" required>
+                                <option value="">Select your country</option>
+                                <option value="United States">🇺🇸 United States</option>
+                                <option value="Canada">🇨🇦 Canada</option>
+                                <option value="United Kingdom">🇬🇧 United Kingdom</option>
+                                <option value="Australia">🇦🇺 Australia</option>
+                                <option value="New Zealand">🇳🇿 New Zealand</option>
+                                <option value="India">🇮🇳 India</option>
+                                <option value="Singapore">🇸🇬 Singapore</option>
+                                <option value="United Arab Emirates">🇦🇪 United Arab Emirates</option>
+                                <option value="Saudi Arabia">🇸🇦 Saudi Arabia</option>
+                                <option value="Qatar">🇶🇦 Qatar</option>
+                                <option value="Kuwait">🇰🇼 Kuwait</option>
+                                <option value="Germany">🇩🇪 Germany</option>
+                                <option value="France">🇫🇷 France</option>
+                                <option value="Netherlands">🇳🇱 Netherlands</option>
+                                <option value="Switzerland">🇨🇭 Switzerland</option>
+                                <option value="Sweden">🇸🇪 Sweden</option>
+                                <option value="Norway">🇳🇴 Norway</option>
+                                <option value="Japan">🇯🇵 Japan</option>
+                                <option value="South Korea">🇰🇷 South Korea</option>
+                                <option value="China">🇨🇳 China</option>
+                                <option value="Hong Kong">🇭🇰 Hong Kong</option>
+                                <option value="Malaysia">🇲🇾 Malaysia</option>
+                                <option value="Thailand">🇹🇭 Thailand</option>
+                                <option value="Philippines">🇵🇭 Philippines</option>
+                                <option value="Indonesia">🇮🇩 Indonesia</option>
+                                <option value="Vietnam">🇻🇳 Vietnam</option>
+                                <option value="Bangladesh">🇧🇩 Bangladesh</option>
+                                <option value="Pakistan">🇵🇰 Pakistan</option>
+                                <option value="Sri Lanka">🇱🇰 Sri Lanka</option>
+                                <option value="Nepal">🇳🇵 Nepal</option>
+                                <option value="Mexico">🇲🇽 Mexico</option>
+                                <option value="Brazil">🇧🇷 Brazil</option>
+                                <option value="Argentina">🇦🇷 Argentina</option>
+                                <option value="Chile">🇨🇱 Chile</option>
+                                <option value="Colombia">🇨🇴 Colombia</option>
+                                <option value="Peru">🇵🇪 Peru</option>
+                                <option value="South Africa">🇿🇦 South Africa</option>
+                                <option value="Nigeria">🇳🇬 Nigeria</option>
+                                <option value="Egypt">🇪🇬 Egypt</option>
+                                <option value="Morocco">🇲🇦 Morocco</option>
+                                <option value="Turkey">🇹🇷 Turkey</option>
+                                <option value="Israel">🇮🇱 Israel</option>
+                                <option value="Jordan">🇯🇴 Jordan</option>
+                                <option value="Lebanon">🇱🇧 Lebanon</option>
+                                <option value="Other">🌍 Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="timezone">Time Zone <span class="required">*</span></label>
+                            <select id="timezone" name="timezone" class="form-control" required>
+                                <option value="">Select your time zone</option>
+                                <option value="Pacific/Honolulu">🌺 Hawaii (HST, UTC-10)</option>
+                                <option value="America/Anchorage">❄️ Alaska (AKST, UTC-9)</option>
+                                <option value="America/Los_Angeles">🌴 Pacific (PST/PDT, UTC-8/-7)</option>
+                                <option value="America/Denver">🏔️ Mountain (MST/MDT, UTC-7/-6)</option>
+                                <option value="America/Chicago">🌾 Central (CST/CDT, UTC-6/-5)</option>
+                                <option value="America/New_York">🗽 Eastern (EST/EDT, UTC-5/-4)</option>
+                                <option value="America/Halifax">🍁 Atlantic (AST/ADT, UTC-4/-3)</option>
+                                <option value="America/St_Johns">🐧 Newfoundland (NST/NDT, UTC-3:30/-2:30)</option>
+                                <option value="America/Toronto">🍁 Toronto (EST/EDT, UTC-5/-4)</option>
+                                <option value="America/Vancouver">🍁 Vancouver (PST/PDT, UTC-8/-7)</option>
+                                <option value="Europe/London">🇬🇧 London (GMT/BST, UTC+0/+1)</option>
+                                <option value="Europe/Paris">🇫🇷 Paris (CET/CEST, UTC+1/+2)</option>
+                                <option value="Europe/Berlin">🇩🇪 Berlin (CET/CEST, UTC+1/+2)</option>
+                                <option value="Europe/Rome">🇮🇹 Rome (CET/CEST, UTC+1/+2)</option>
+                                <option value="Europe/Amsterdam">🇳🇱 Amsterdam (CET/CEST, UTC+1/+2)</option>
+                                <option value="Europe/Zurich">🇨🇭 Zurich (CET/CEST, UTC+1/+2)</option>
+                                <option value="Europe/Stockholm">🇸🇪 Stockholm (CET/CEST, UTC+1/+2)</option>
+                                <option value="Europe/Oslo">🇳🇴 Oslo (CET/CEST, UTC+1/+2)</option>
+                                <option value="Asia/Dubai">🇦🇪 Dubai (GST, UTC+4)</option>
+                                <option value="Asia/Riyadh">🇸🇦 Riyadh (AST, UTC+3)</option>
+                                <option value="Asia/Qatar">🇶🇦 Qatar (AST, UTC+3)</option>
+                                <option value="Asia/Kuwait">🇰🇼 Kuwait (AST, UTC+3)</option>
+                                <option value="Asia/Kolkata">🇮🇳 India (IST, UTC+5:30)</option>
+                                <option value="Asia/Dhaka">🇧🇩 Bangladesh (BST, UTC+6)</option>
+                                <option value="Asia/Karachi">🇵🇰 Pakistan (PKT, UTC+5)</option>
+                                <option value="Asia/Colombo">🇱🇰 Sri Lanka (SLST, UTC+5:30)</option>
+                                <option value="Asia/Kathmandu">🇳🇵 Nepal (NPT, UTC+5:45)</option>
+                                <option value="Asia/Singapore">🇸🇬 Singapore (SGT, UTC+8)</option>
+                                <option value="Asia/Hong_Kong">🇭🇰 Hong Kong (HKT, UTC+8)</option>
+                                <option value="Asia/Shanghai">🇨🇳 China (CST, UTC+8)</option>
+                                <option value="Asia/Tokyo">🇯🇵 Japan (JST, UTC+9)</option>
+                                <option value="Asia/Seoul">🇰🇷 South Korea (KST, UTC+9)</option>
+                                <option value="Asia/Kuala_Lumpur">🇲🇾 Malaysia (MYT, UTC+8)</option>
+                                <option value="Asia/Bangkok">🇹🇭 Thailand (ICT, UTC+7)</option>
+                                <option value="Asia/Manila">🇵🇭 Philippines (PST, UTC+8)</option>
+                                <option value="Asia/Jakarta">🇮🇩 Indonesia (WIB, UTC+7)</option>
+                                <option value="Asia/Ho_Chi_Minh">🇻🇳 Vietnam (ICT, UTC+7)</option>
+                                <option value="Australia/Sydney">🇦🇺 Sydney (AEST/AEDT, UTC+10/+11)</option>
+                                <option value="Australia/Melbourne">🇦🇺 Melbourne (AEST/AEDT, UTC+10/+11)</option>
+                                <option value="Australia/Perth">🇦🇺 Perth (AWST, UTC+8)</option>
+                                <option value="Pacific/Auckland">🇳🇿 New Zealand (NZST/NZDT, UTC+12/+13)</option>
+                                <option value="America/Mexico_City">🇲🇽 Mexico City (CST/CDT, UTC-6/-5)</option>
+                                <option value="America/Sao_Paulo">🇧🇷 São Paulo (BRT/BRST, UTC-3/-2)</option>
+                                <option value="America/Argentina/Buenos_Aires">🇦🇷 Buenos Aires (ART, UTC-3)</option>
+                                <option value="America/Santiago">🇨🇱 Santiago (CLT/CLST, UTC-4/-3)</option>
+                                <option value="America/Bogota">🇨🇴 Bogotá (COT, UTC-5)</option>
+                                <option value="America/Lima">🇵🇪 Lima (PET, UTC-5)</option>
+                                <option value="Africa/Johannesburg">🇿🇦 Johannesburg (SAST, UTC+2)</option>
+                                <option value="Africa/Lagos">🇳🇬 Lagos (WAT, UTC+1)</option>
+                                <option value="Africa/Cairo">🇪🇬 Cairo (EET, UTC+2)</option>
+                                <option value="Africa/Casablanca">🇲🇦 Casablanca (WET, UTC+0)</option>
+                                <option value="Europe/Istanbul">🇹🇷 Istanbul (TRT, UTC+3)</option>
+                                <option value="Asia/Jerusalem">🇮🇱 Jerusalem (IST, UTC+2)</option>
+                                <option value="Asia/Amman">🇯🇴 Amman (EET, UTC+2)</option>
+                                <option value="Asia/Beirut">🇱🇧 Beirut (EET, UTC+2)</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
@@ -457,33 +624,64 @@
                     </h3>
                     
                     <div class="form-group">
-                        <label>Preferred tutoring times (optional)</label>
-                        <div class="time-preferences" id="timePreferences">
-                            <div class="time-row">
-                                <select name="preferredDay1" class="form-control">
-                                    <option value="">Select Day</option>
-                                    <option value="Monday">Monday</option>
-                                    <option value="Tuesday">Tuesday</option>
-                                    <option value="Wednesday">Wednesday</option>
-                                    <option value="Thursday">Thursday</option>
-                                    <option value="Friday">Friday</option>
-                                    <option value="Saturday">Saturday</option>
-                                    <option value="Sunday">Sunday</option>
-                                </select>
-                                <input type="text" name="preferredTime1" class="form-control" placeholder="e.g., 3:00 PM - 4:00 PM">
+                        <label>Select your preferred days and times (optional)</label>
+                        <p style="font-size: 14px; color: #666; margin-bottom: 20px;">Note: Times will be coordinated based on your time zone. You can select multiple days.</p>
+                        
+                        <div class="schedule-grid">
+                            <div class="day-time-row">
+                                <div class="day-checkbox">
+                                    <input type="checkbox" id="monday" name="scheduleDay" value="Monday">
+                                    <label for="monday">Monday</label>
+                                </div>
+                                <input type="text" name="mondayTime" class="form-control time-input" placeholder="e.g., 3:00 PM - 4:00 PM" disabled>
                             </div>
-                            <div class="time-row">
-                                <select name="preferredDay2" class="form-control">
-                                    <option value="">Select Day</option>
-                                    <option value="Monday">Monday</option>
-                                    <option value="Tuesday">Tuesday</option>
-                                    <option value="Wednesday">Wednesday</option>
-                                    <option value="Thursday">Thursday</option>
-                                    <option value="Friday">Friday</option>
-                                    <option value="Saturday">Saturday</option>
-                                    <option value="Sunday">Sunday</option>
-                                </select>
-                                <input type="text" name="preferredTime2" class="form-control" placeholder="e.g., 7:00 PM - 8:00 PM">
+                            
+                            <div class="day-time-row">
+                                <div class="day-checkbox">
+                                    <input type="checkbox" id="tuesday" name="scheduleDay" value="Tuesday">
+                                    <label for="tuesday">Tuesday</label>
+                                </div>
+                                <input type="text" name="tuesdayTime" class="form-control time-input" placeholder="e.g., 3:00 PM - 4:00 PM" disabled>
+                            </div>
+                            
+                            <div class="day-time-row">
+                                <div class="day-checkbox">
+                                    <input type="checkbox" id="wednesday" name="scheduleDay" value="Wednesday">
+                                    <label for="wednesday">Wednesday</label>
+                                </div>
+                                <input type="text" name="wednesdayTime" class="form-control time-input" placeholder="e.g., 3:00 PM - 4:00 PM" disabled>
+                            </div>
+                            
+                            <div class="day-time-row">
+                                <div class="day-checkbox">
+                                    <input type="checkbox" id="thursday" name="scheduleDay" value="Thursday">
+                                    <label for="thursday">Thursday</label>
+                                </div>
+                                <input type="text" name="thursdayTime" class="form-control time-input" placeholder="e.g., 3:00 PM - 4:00 PM" disabled>
+                            </div>
+                            
+                            <div class="day-time-row">
+                                <div class="day-checkbox">
+                                    <input type="checkbox" id="friday" name="scheduleDay" value="Friday">
+                                    <label for="friday">Friday</label>
+                                </div>
+                                <input type="text" name="fridayTime" class="form-control time-input" placeholder="e.g., 3:00 PM - 4:00 PM" disabled>
+                            </div>
+                            
+                            <div class="day-time-row">
+                                <div class="day-checkbox">
+                                    <input type="checkbox" id="saturday" name="scheduleDay" value="Saturday">
+                                    <label for="saturday">Saturday</label>
+                                </div>
+                                <input type="text" name="saturdayTime" class="form-control time-input" placeholder="e.g., 10:00 AM - 11:00 AM" disabled>
+                            </div>
+                            
+                            <div class="day-time-row">
+                                <div class="day-checkbox">
+                                    <input type="checkbox" id="sunday" name="scheduleDay" value="Sunday">
+                                    <label for="sunday">Sunday</label>
+                                </div>
+                                <input type="text" name="sundayTime" class="form-control time-input" placeholder="e.g., 10:00 AM - 11:00 AM" disabled>
                             </div>
                         </div>
                     </div>
@@ -502,7 +700,7 @@
                         </div>
                         <div class="form-group">
                             <label for="parentPhone">Parent/Guardian Phone</label>
-                            <input type="tel" id="parentPhone" name="parentPhone" class="form-control">
+                            <input type="tel" id="parentPhone" name="parentPhone" class="form-control" placeholder="Include country code if international">
                         </div>
                     </div>
                     
@@ -537,6 +735,26 @@
     </div>
 
     <script>
+        // Enable/disable time inputs based on day checkboxes
+        document.addEventListener('DOMContentLoaded', function() {
+            const dayCheckboxes = document.querySelectorAll('input[name="scheduleDay"]');
+            
+            dayCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const day = this.value.toLowerCase();
+                    const timeInput = document.querySelector(`input[name="${day}Time"]`);
+                    
+                    if (this.checked) {
+                        timeInput.disabled = false;
+                        timeInput.focus();
+                    } else {
+                        timeInput.disabled = true;
+                        timeInput.value = '';
+                    }
+                });
+            });
+        });
+
         document.getElementById('registrationForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -565,20 +783,23 @@
                     throw new Error('Please select at least one subject');
                 }
                 
-                // Get preferred times
+                // Get preferred times from checkboxes
                 const preferredTimes = [];
-                if (formData.get('preferredDay1') && formData.get('preferredTime1')) {
-                    preferredTimes.push({
-                        day: formData.get('preferredDay1'),
-                        time: formData.get('preferredTime1')
-                    });
-                }
-                if (formData.get('preferredDay2') && formData.get('preferredTime2')) {
-                    preferredTimes.push({
-                        day: formData.get('preferredDay2'),
-                        time: formData.get('preferredTime2')
-                    });
-                }
+                const checkedDays = document.querySelectorAll('input[name="scheduleDay"]:checked');
+                
+                checkedDays.forEach(dayCheckbox => {
+                    const day = dayCheckbox.value;
+                    const dayLower = day.toLowerCase();
+                    const timeInput = document.querySelector(`input[name="${dayLower}Time"]`);
+                    const time = timeInput.value.trim();
+                    
+                    if (time) {
+                        preferredTimes.push({
+                            day: day,
+                            time: time
+                        });
+                    }
+                });
                 
                 // Prepare data for submission
                 const registrationData = {
@@ -587,6 +808,8 @@
                     email: formData.get('email'),
                     phone: formData.get('phone'),
                     grade: formData.get('grade'),
+                    country: formData.get('country'),
+                    timezone: formData.get('timezone'),
                     subjects: subjects,
                     preferredTimes: preferredTimes,
                     parentName: formData.get('parentName'),
@@ -607,18 +830,32 @@
                 const result = await response.json();
                 
                 if (result.success) {
-                    // Show success message
+                    // Show success message prominently
                     alertContainer.innerHTML = `
                         <div class="alert alert-success">
-                            <i class="fas fa-check-circle"></i> ${result.message}
+                            <i class="fas fa-check-circle"></i> <strong>Registration Successful!</strong><br>
+                            ${result.message}
                         </div>
                     `;
                     
-                    // Reset form
-                    this.reset();
+                    // Update submit button to show success
+                    submitBtn.innerHTML = '<i class="fas fa-check"></i> Registration Complete!';
+                    submitBtn.style.background = '#28a745';
                     
-                    // Scroll to top
+                    // Reset form after showing success
+                    setTimeout(() => {
+                        this.reset();
+                        submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Registration';
+                        submitBtn.style.background = '';
+                    }, 3000);
+                    
+                    // Scroll to top to show message
                     window.scrollTo({ top: 0, behavior: 'smooth' });
+                    
+                    // Also scroll the alert into view after a brief delay
+                    setTimeout(() => {
+                        alertContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 300);
                 } else {
                     throw new Error(result.message || 'Registration failed');
                 }
