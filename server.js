@@ -151,12 +151,23 @@ console.log('Email User:', process.env.EMAIL_USER ? 'Set' : 'Not set');
 console.log('Email Pass:', process.env.EMAIL_PASS ? 'Set' : 'Not set');
 console.log('EMAIL_PASS value preview:', process.env.EMAIL_PASS ? process.env.EMAIL_PASS.substring(0, 4) + '****' : 'undefined');
 
-// Force Gmail configuration (for debugging)
+// Enhanced Gmail SMTP configuration for better deliverability
 const transporter = nodemailer.createTransport({
   service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false,
   auth: {
     user: 'khan.apcalculus@gmail.com',
     pass: process.env.EMAIL_PASS
+  },
+  tls: {
+    rejectUnauthorized: false
+  },
+  // Additional headers for better deliverability
+  defaults: {
+    from: '"LCC360 Tutoring" <khan.apcalculus@gmail.com>',
+    replyTo: 'khan.apcalculus@gmail.com'
   }
 });
 
@@ -387,14 +398,49 @@ app.post('/api/register', async (req, res) => {
     const isParentEmail = parentName && parentEmail;
     const emailRecipient = isParentEmail ? parentEmail : email;
     const subjectLine = isParentEmail ? 
-      `🎓 Welcome to LCC360 - ${firstName}'s Tutoring Registration Confirmed` : 
-      '🎓 Welcome to LCC360 - Your Tutoring Registration Confirmed';
+      `Welcome to LCC360 - ${firstName}'s Registration Confirmed` : 
+      'Welcome to LCC360 - Your Registration Confirmed';
 
     // Send confirmation email
     const studentMailOptions = {
-      from: process.env.EMAIL_USER || 'khan.apcalculus@gmail.com',
+      from: '"LCC360 Tutoring" <khan.apcalculus@gmail.com>',
       to: emailRecipient,
       subject: subjectLine,
+      text: `Dear ${recipientName},
+
+Thank you for registering with LCC360 - Learning Coach Center Tutoring! We're thrilled to welcome ${isParentEmail ? 'your child' : 'you'} to our growing community of motivated learners.
+
+REGISTRATION CONFIRMED
+======================
+You've enrolled ${isParentEmail ? 'your child' : ''} for support in: ${subjects.join(', ')}
+
+${aiPersonalizedMessage ? `PERSONALIZED MESSAGE:\n${aiPersonalizedMessage.replace(/<[^>]*>/g, '')}\n\n` : ''}
+
+WHAT YOU CAN EXPECT:
+- Expert Tutors: Highly qualified instructors in mathematics and sciences
+- Customized Lessons: Tailored to ${isParentEmail ? 'your child\'s' : 'your'} current level and goals
+- Online Convenience: Live sessions via Zoom/Google Meet
+- Progress Updates: Regular feedback on performance and improvement
+
+NEXT STEPS:
+- We'll contact you shortly to schedule the first session
+- Your first session is completely FREE with no obligations
+- We believe in letting our teaching speak for itself
+
+CONTACT INFORMATION:
+Phone & WhatsApp: 714-400-8283
+Email: khan.apcalculus@gmail.com
+Website: www.lcc360.com
+Address: 117 Bernal Road Suite 227, Silicon Valley, CA 95119 USA
+
+We're committed to transparency and partnership with ${isParentEmail ? 'parents' : 'students'}. Please don't hesitate to contact us at any time.
+
+Welcome to LCC360 Tutoring - we're honored to be part of ${isParentEmail ? 'your child\'s' : 'your'} academic journey.
+
+Warm regards,
+Amjad Khan
+Founder & Lead Instructor
+LCC360 - Learning Coach Center Tutoring`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 650px; margin: 0 auto; line-height: 1.6;">
           <div style="text-align: center; margin-bottom: 30px; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%); border-radius: 10px;">
@@ -404,7 +450,7 @@ app.post('/api/register', async (req, res) => {
           
           <p style="font-size: 16px; margin-bottom: 20px;">Dear ${recipientName},</p>
           
-          <p style="font-size: 16px;">Thank you for registering with <strong>LCC360</strong> — where world-class math instruction meets personal attention and care. We're thrilled to welcome ${isParentEmail ? 'your child' : 'you'} to our growing community of motivated learners.</p>
+          <p style="font-size: 16px;">Thank you for registering with LCC360 Learning Coach Center Tutoring. We are excited to welcome ${isParentEmail ? 'your child' : 'you'} to our community of students who are working to excel in their studies.</p>
           
           <p style="font-size: 16px;">You've enrolled ${isParentEmail ? 'your child' : ''} for support in the following subject(s):</p>
           
@@ -455,9 +501,9 @@ app.post('/api/register', async (req, res) => {
 
     // Send notification email to tutor
     const tutorMailOptions = {
-      from: process.env.EMAIL_USER || 'khan.apcalculus@gmail.com',
+      from: '"LCC360 Registration System" <khan.apcalculus@gmail.com>',
       to: 'khan.apcalculus@gmail.com',
-      subject: '🔔 New Student Registration',
+      subject: 'New Student Registration - Action Required',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <div style="text-align: center; margin-bottom: 30px; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%); border-radius: 10px;">

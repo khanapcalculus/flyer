@@ -273,6 +273,137 @@
             100% { transform: scale(1); opacity: 1; }
         }
 
+        /* Modal Dialog Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 10% auto;
+            padding: 0;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.4s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes modalSlideIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(-50px) scale(0.8); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
+        }
+
+        .modal-header {
+            padding: 25px 25px 0 25px;
+            text-align: center;
+        }
+
+        .modal-header.success {
+            background: linear-gradient(135deg, #d4f6da 0%, #c3e6cb 100%);
+            color: #155724;
+        }
+
+        .modal-header.error {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            color: #721c24;
+        }
+
+        .modal-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            animation: iconBounce 0.6s ease-out 0.2s both;
+        }
+
+        @keyframes iconBounce {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .modal-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin: 0 0 10px 0;
+        }
+
+        .modal-body {
+            padding: 20px 25px;
+            text-align: center;
+        }
+
+        .modal-message {
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        .modal-footer {
+            padding: 0 25px 25px 25px;
+            text-align: center;
+        }
+
+        .modal-btn {
+            background: #002147;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .modal-btn:hover {
+            background: #003366;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 33, 71, 0.4);
+        }
+
+        .modal-btn.error {
+            background: #dc3545;
+        }
+
+        .modal-btn.error:hover {
+            background: #c82333;
+            box-shadow: 0 8px 25px rgba(220, 53, 69, 0.4);
+        }
+
+        .close {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+        }
+
         .alert-error {
             background: #f8d7da;
             color: #721c24;
@@ -345,6 +476,23 @@
             <div class="loading" id="loadingIndicator">
                 <div class="spinner"></div>
                 <p>Submitting your registration...</p>
+            </div>
+
+            <!-- Modal Dialog -->
+            <div id="responseModal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <div id="modalHeader" class="modal-header">
+                        <div id="modalIcon" class="modal-icon"></div>
+                        <h2 id="modalTitle" class="modal-title"></h2>
+                    </div>
+                    <div class="modal-body">
+                        <p id="modalMessage" class="modal-message"></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="modalBtn" class="modal-btn">OK</button>
+                    </div>
+                </div>
             </div>
 
             <form id="registrationForm">
@@ -446,63 +594,9 @@
                         </div>
                         <div class="form-group">
                             <label for="timezone">Time Zone <span class="required">*</span></label>
+                            <p id="timezoneHelper" style="font-size: 12px; color: #888; margin-bottom: 5px;">Please select a country first</p>
                             <select id="timezone" name="timezone" class="form-control" required>
-                                <option value="">Select your time zone</option>
-                                <option value="Pacific/Honolulu">🌺 Hawaii (HST, UTC-10)</option>
-                                <option value="America/Anchorage">❄️ Alaska (AKST, UTC-9)</option>
-                                <option value="America/Los_Angeles">🌴 Pacific (PST/PDT, UTC-8/-7)</option>
-                                <option value="America/Denver">🏔️ Mountain (MST/MDT, UTC-7/-6)</option>
-                                <option value="America/Chicago">🌾 Central (CST/CDT, UTC-6/-5)</option>
-                                <option value="America/New_York">🗽 Eastern (EST/EDT, UTC-5/-4)</option>
-                                <option value="America/Halifax">🍁 Atlantic (AST/ADT, UTC-4/-3)</option>
-                                <option value="America/St_Johns">🐧 Newfoundland (NST/NDT, UTC-3:30/-2:30)</option>
-                                <option value="America/Toronto">🍁 Toronto (EST/EDT, UTC-5/-4)</option>
-                                <option value="America/Vancouver">🍁 Vancouver (PST/PDT, UTC-8/-7)</option>
-                                <option value="Europe/London">🇬🇧 London (GMT/BST, UTC+0/+1)</option>
-                                <option value="Europe/Paris">🇫🇷 Paris (CET/CEST, UTC+1/+2)</option>
-                                <option value="Europe/Berlin">🇩🇪 Berlin (CET/CEST, UTC+1/+2)</option>
-                                <option value="Europe/Rome">🇮🇹 Rome (CET/CEST, UTC+1/+2)</option>
-                                <option value="Europe/Amsterdam">🇳🇱 Amsterdam (CET/CEST, UTC+1/+2)</option>
-                                <option value="Europe/Zurich">🇨🇭 Zurich (CET/CEST, UTC+1/+2)</option>
-                                <option value="Europe/Stockholm">🇸🇪 Stockholm (CET/CEST, UTC+1/+2)</option>
-                                <option value="Europe/Oslo">🇳🇴 Oslo (CET/CEST, UTC+1/+2)</option>
-                                <option value="Asia/Dubai">🇦🇪 Dubai (GST, UTC+4)</option>
-                                <option value="Asia/Riyadh">🇸🇦 Riyadh (AST, UTC+3)</option>
-                                <option value="Asia/Qatar">🇶🇦 Qatar (AST, UTC+3)</option>
-                                <option value="Asia/Kuwait">🇰🇼 Kuwait (AST, UTC+3)</option>
-                                <option value="Asia/Kolkata">🇮🇳 India (IST, UTC+5:30)</option>
-                                <option value="Asia/Dhaka">🇧🇩 Bangladesh (BST, UTC+6)</option>
-                                <option value="Asia/Karachi">🇵🇰 Pakistan (PKT, UTC+5)</option>
-                                <option value="Asia/Colombo">🇱🇰 Sri Lanka (SLST, UTC+5:30)</option>
-                                <option value="Asia/Kathmandu">🇳🇵 Nepal (NPT, UTC+5:45)</option>
-                                <option value="Asia/Singapore">🇸🇬 Singapore (SGT, UTC+8)</option>
-                                <option value="Asia/Hong_Kong">🇭🇰 Hong Kong (HKT, UTC+8)</option>
-                                <option value="Asia/Shanghai">🇨🇳 China (CST, UTC+8)</option>
-                                <option value="Asia/Tokyo">🇯🇵 Japan (JST, UTC+9)</option>
-                                <option value="Asia/Seoul">🇰🇷 South Korea (KST, UTC+9)</option>
-                                <option value="Asia/Kuala_Lumpur">🇲🇾 Malaysia (MYT, UTC+8)</option>
-                                <option value="Asia/Bangkok">🇹🇭 Thailand (ICT, UTC+7)</option>
-                                <option value="Asia/Manila">🇵🇭 Philippines (PST, UTC+8)</option>
-                                <option value="Asia/Jakarta">🇮🇩 Indonesia (WIB, UTC+7)</option>
-                                <option value="Asia/Ho_Chi_Minh">🇻🇳 Vietnam (ICT, UTC+7)</option>
-                                <option value="Australia/Sydney">🇦🇺 Sydney (AEST/AEDT, UTC+10/+11)</option>
-                                <option value="Australia/Melbourne">🇦🇺 Melbourne (AEST/AEDT, UTC+10/+11)</option>
-                                <option value="Australia/Perth">🇦🇺 Perth (AWST, UTC+8)</option>
-                                <option value="Pacific/Auckland">🇳🇿 New Zealand (NZST/NZDT, UTC+12/+13)</option>
-                                <option value="America/Mexico_City">🇲🇽 Mexico City (CST/CDT, UTC-6/-5)</option>
-                                <option value="America/Sao_Paulo">🇧🇷 São Paulo (BRT/BRST, UTC-3/-2)</option>
-                                <option value="America/Argentina/Buenos_Aires">🇦🇷 Buenos Aires (ART, UTC-3)</option>
-                                <option value="America/Santiago">🇨🇱 Santiago (CLT/CLST, UTC-4/-3)</option>
-                                <option value="America/Bogota">🇨🇴 Bogotá (COT, UTC-5)</option>
-                                <option value="America/Lima">🇵🇪 Lima (PET, UTC-5)</option>
-                                <option value="Africa/Johannesburg">🇿🇦 Johannesburg (SAST, UTC+2)</option>
-                                <option value="Africa/Lagos">🇳🇬 Lagos (WAT, UTC+1)</option>
-                                <option value="Africa/Cairo">🇪🇬 Cairo (EET, UTC+2)</option>
-                                <option value="Africa/Casablanca">🇲🇦 Casablanca (WET, UTC+0)</option>
-                                <option value="Europe/Istanbul">🇹🇷 Istanbul (TRT, UTC+3)</option>
-                                <option value="Asia/Jerusalem">🇮🇱 Jerusalem (IST, UTC+2)</option>
-                                <option value="Asia/Amman">🇯🇴 Amman (EET, UTC+2)</option>
-                                <option value="Asia/Beirut">🇱🇧 Beirut (EET, UTC+2)</option>
+                                <option value="">First select your country above</option>
                             </select>
                         </div>
                     </div>
@@ -735,10 +829,238 @@
     </div>
 
     <script>
+        // Modal functions
+        function showModal(type, title, message, callback = null) {
+            const modal = document.getElementById('responseModal');
+            const modalHeader = document.getElementById('modalHeader');
+            const modalIcon = document.getElementById('modalIcon');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalMessage = document.getElementById('modalMessage');
+            const modalBtn = document.getElementById('modalBtn');
+            
+            // Reset classes
+            modalHeader.className = 'modal-header';
+            modalBtn.className = 'modal-btn';
+            
+            if (type === 'success') {
+                modalHeader.classList.add('success');
+                modalIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
+                modalTitle.textContent = title;
+                modalMessage.innerHTML = message;
+            } else if (type === 'error') {
+                modalHeader.classList.add('error');
+                modalBtn.classList.add('error');
+                modalIcon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+                modalTitle.textContent = title;
+                modalMessage.innerHTML = message;
+            }
+            
+            modal.style.display = 'block';
+            
+            // Handle modal close
+            const handleClose = () => {
+                modal.style.display = 'none';
+                if (callback) callback();
+            };
+            
+            modalBtn.onclick = handleClose;
+            document.querySelector('.close').onclick = handleClose;
+            
+            // Close on outside click
+            window.onclick = function(event) {
+                if (event.target === modal) {
+                    handleClose();
+                }
+            };
+            
+            // Close on escape key
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape' && modal.style.display === 'block') {
+                    handleClose();
+                }
+            });
+        }
+
+        // Country to timezone mapping
+        const countryTimezones = {
+            'United States': [
+                'Pacific/Honolulu', 'America/Anchorage', 'America/Los_Angeles', 
+                'America/Denver', 'America/Chicago', 'America/New_York'
+            ],
+            'Canada': [
+                'America/Vancouver', 'America/Denver', 'America/Chicago', 
+                'America/Toronto', 'America/Halifax', 'America/St_Johns'
+            ],
+            'United Kingdom': ['Europe/London'],
+            'Australia': ['Australia/Perth', 'Australia/Sydney', 'Australia/Melbourne'],
+            'New Zealand': ['Pacific/Auckland'],
+            'India': ['Asia/Kolkata'],
+            'Singapore': ['Asia/Singapore'],
+            'United Arab Emirates': ['Asia/Dubai'],
+            'Saudi Arabia': ['Asia/Riyadh'],
+            'Qatar': ['Asia/Qatar'],
+            'Kuwait': ['Asia/Kuwait'],
+            'Germany': ['Europe/Berlin'],
+            'France': ['Europe/Paris'],
+            'Netherlands': ['Europe/Amsterdam'],
+            'Switzerland': ['Europe/Zurich'],
+            'Sweden': ['Europe/Stockholm'],
+            'Norway': ['Europe/Oslo'],
+            'Japan': ['Asia/Tokyo'],
+            'South Korea': ['Asia/Seoul'],
+            'China': ['Asia/Shanghai'],
+            'Hong Kong': ['Asia/Hong_Kong'],
+            'Malaysia': ['Asia/Kuala_Lumpur'],
+            'Thailand': ['Asia/Bangkok'],
+            'Philippines': ['Asia/Manila'],
+            'Indonesia': ['Asia/Jakarta'],
+            'Vietnam': ['Asia/Ho_Chi_Minh'],
+            'Bangladesh': ['Asia/Dhaka'],
+            'Pakistan': ['Asia/Karachi'],
+            'Sri Lanka': ['Asia/Colombo'],
+            'Nepal': ['Asia/Kathmandu'],
+            'Mexico': ['America/Mexico_City'],
+            'Brazil': ['America/Sao_Paulo'],
+            'Argentina': ['America/Argentina/Buenos_Aires'],
+            'Chile': ['America/Santiago'],
+            'Colombia': ['America/Bogota'],
+            'Peru': ['America/Lima'],
+            'South Africa': ['Africa/Johannesburg'],
+            'Nigeria': ['Africa/Lagos'],
+            'Egypt': ['Africa/Cairo'],
+            'Morocco': ['Africa/Casablanca'],
+            'Turkey': ['Europe/Istanbul'],
+            'Israel': ['Asia/Jerusalem'],
+            'Jordan': ['Asia/Amman'],
+            'Lebanon': ['Asia/Beirut']
+        };
+
+        // All timezone options with labels
+        const allTimezones = [
+            { value: 'Pacific/Honolulu', label: '🌺 Hawaii (HST, UTC-10)' },
+            { value: 'America/Anchorage', label: '❄️ Alaska (AKST, UTC-9)' },
+            { value: 'America/Los_Angeles', label: '🌴 Pacific (PST/PDT, UTC-8/-7)' },
+            { value: 'America/Denver', label: '🏔️ Mountain (MST/MDT, UTC-7/-6)' },
+            { value: 'America/Chicago', label: '🌾 Central (CST/CDT, UTC-6/-5)' },
+            { value: 'America/New_York', label: '🗽 Eastern (EST/EDT, UTC-5/-4)' },
+            { value: 'America/Halifax', label: '🍁 Atlantic (AST/ADT, UTC-4/-3)' },
+            { value: 'America/St_Johns', label: '🐧 Newfoundland (NST/NDT, UTC-3:30/-2:30)' },
+            { value: 'America/Toronto', label: '🍁 Toronto (EST/EDT, UTC-5/-4)' },
+            { value: 'America/Vancouver', label: '🍁 Vancouver (PST/PDT, UTC-8/-7)' },
+            { value: 'Europe/London', label: '🇬🇧 London (GMT/BST, UTC+0/+1)' },
+            { value: 'Europe/Paris', label: '🇫🇷 Paris (CET/CEST, UTC+1/+2)' },
+            { value: 'Europe/Berlin', label: '🇩🇪 Berlin (CET/CEST, UTC+1/+2)' },
+            { value: 'Europe/Rome', label: '🇮🇹 Rome (CET/CEST, UTC+1/+2)' },
+            { value: 'Europe/Amsterdam', label: '🇳🇱 Amsterdam (CET/CEST, UTC+1/+2)' },
+            { value: 'Europe/Zurich', label: '🇨🇭 Zurich (CET/CEST, UTC+1/+2)' },
+            { value: 'Europe/Stockholm', label: '🇸🇪 Stockholm (CET/CEST, UTC+1/+2)' },
+            { value: 'Europe/Oslo', label: '🇳🇴 Oslo (CET/CEST, UTC+1/+2)' },
+            { value: 'Asia/Dubai', label: '🇦🇪 Dubai (GST, UTC+4)' },
+            { value: 'Asia/Riyadh', label: '🇸🇦 Riyadh (AST, UTC+3)' },
+            { value: 'Asia/Qatar', label: '🇶🇦 Qatar (AST, UTC+3)' },
+            { value: 'Asia/Kuwait', label: '🇰🇼 Kuwait (AST, UTC+3)' },
+            { value: 'Asia/Kolkata', label: '🇮🇳 India (IST, UTC+5:30)' },
+            { value: 'Asia/Dhaka', label: '🇧🇩 Bangladesh (BST, UTC+6)' },
+            { value: 'Asia/Karachi', label: '🇵🇰 Pakistan (PKT, UTC+5)' },
+            { value: 'Asia/Colombo', label: '🇱🇰 Sri Lanka (SLST, UTC+5:30)' },
+            { value: 'Asia/Kathmandu', label: '🇳🇵 Nepal (NPT, UTC+5:45)' },
+            { value: 'Asia/Singapore', label: '🇸🇬 Singapore (SGT, UTC+8)' },
+            { value: 'Asia/Hong_Kong', label: '🇭🇰 Hong Kong (HKT, UTC+8)' },
+            { value: 'Asia/Shanghai', label: '🇨🇳 China (CST, UTC+8)' },
+            { value: 'Asia/Tokyo', label: '🇯🇵 Japan (JST, UTC+9)' },
+            { value: 'Asia/Seoul', label: '🇰🇷 South Korea (KST, UTC+9)' },
+            { value: 'Asia/Kuala_Lumpur', label: '🇲🇾 Malaysia (MYT, UTC+8)' },
+            { value: 'Asia/Bangkok', label: '🇹🇭 Thailand (ICT, UTC+7)' },
+            { value: 'Asia/Manila', label: '🇵🇭 Philippines (PST, UTC+8)' },
+            { value: 'Asia/Jakarta', label: '🇮🇩 Indonesia (WIB, UTC+7)' },
+            { value: 'Asia/Ho_Chi_Minh', label: '🇻🇳 Vietnam (ICT, UTC+7)' },
+            { value: 'Australia/Sydney', label: '🇦🇺 Sydney (AEST/AEDT, UTC+10/+11)' },
+            { value: 'Australia/Melbourne', label: '🇦🇺 Melbourne (AEST/AEDT, UTC+10/+11)' },
+            { value: 'Australia/Perth', label: '🇦🇺 Perth (AWST, UTC+8)' },
+            { value: 'Pacific/Auckland', label: '🇳🇿 New Zealand (NZST/NZDT, UTC+12/+13)' },
+            { value: 'America/Mexico_City', label: '🇲🇽 Mexico City (CST/CDT, UTC-6/-5)' },
+            { value: 'America/Sao_Paulo', label: '🇧🇷 São Paulo (BRT/BRST, UTC-3/-2)' },
+            { value: 'America/Argentina/Buenos_Aires', label: '🇦🇷 Buenos Aires (ART, UTC-3)' },
+            { value: 'America/Santiago', label: '🇨🇱 Santiago (CLT/CLST, UTC-4/-3)' },
+            { value: 'America/Bogota', label: '🇨🇴 Bogotá (COT, UTC-5)' },
+            { value: 'America/Lima', label: '🇵🇪 Lima (PET, UTC-5)' },
+            { value: 'Africa/Johannesburg', label: '🇿🇦 Johannesburg (SAST, UTC+2)' },
+            { value: 'Africa/Lagos', label: '🇳🇬 Lagos (WAT, UTC+1)' },
+            { value: 'Africa/Cairo', label: '🇪🇬 Cairo (EET, UTC+2)' },
+            { value: 'Africa/Casablanca', label: '🇲🇦 Casablanca (WET, UTC+0)' },
+            { value: 'Europe/Istanbul', label: '🇹🇷 Istanbul (TRT, UTC+3)' },
+            { value: 'Asia/Jerusalem', label: '🇮🇱 Jerusalem (IST, UTC+2)' },
+            { value: 'Asia/Amman', label: '🇯🇴 Amman (EET, UTC+2)' },
+            { value: 'Asia/Beirut', label: '🇱🇧 Beirut (EET, UTC+2)' }
+        ];
+
+        function updateTimezoneOptions(selectedCountry) {
+            const timezoneSelect = document.getElementById('timezone');
+            const timezoneHelper = document.getElementById('timezoneHelper');
+            const applicableTimezones = countryTimezones[selectedCountry] || [];
+            
+            // Clear existing options except the first one
+            timezoneSelect.innerHTML = '<option value="">Select your time zone</option>';
+            
+            if (applicableTimezones.length > 0) {
+                // Add only applicable timezones
+                applicableTimezones.forEach(timezoneValue => {
+                    const timezoneData = allTimezones.find(tz => tz.value === timezoneValue);
+                    if (timezoneData) {
+                        const option = document.createElement('option');
+                        option.value = timezoneData.value;
+                        option.textContent = timezoneData.label;
+                        timezoneSelect.appendChild(option);
+                    }
+                });
+                
+                timezoneSelect.disabled = false;
+                timezoneSelect.style.opacity = '1';
+                timezoneHelper.textContent = `Choose your timezone in ${selectedCountry}`;
+                timezoneHelper.style.color = '#002147';
+            } else {
+                // If country not found, show all timezones
+                allTimezones.forEach(timezone => {
+                    const option = document.createElement('option');
+                    option.value = timezone.value;
+                    option.textContent = timezone.label;
+                    timezoneSelect.appendChild(option);
+                });
+                
+                timezoneSelect.disabled = false;
+                timezoneSelect.style.opacity = '1';
+                timezoneHelper.textContent = 'Select your time zone from the list below';
+                timezoneHelper.style.color = '#002147';
+            }
+        }
+
         // Enable/disable time inputs based on day checkboxes
         document.addEventListener('DOMContentLoaded', function() {
             const dayCheckboxes = document.querySelectorAll('input[name="scheduleDay"]');
+            const countrySelect = document.getElementById('country');
+            const timezoneSelect = document.getElementById('timezone');
             
+            // Initially disable timezone until country is selected
+            timezoneSelect.disabled = true;
+            timezoneSelect.style.opacity = '0.6';
+            
+            // Handle country selection change
+            countrySelect.addEventListener('change', function() {
+                const selectedCountry = this.value;
+                const timezoneHelper = document.getElementById('timezoneHelper');
+                
+                if (selectedCountry) {
+                    updateTimezoneOptions(selectedCountry);
+                } else {
+                    timezoneSelect.disabled = true;
+                    timezoneSelect.style.opacity = '0.6';
+                    timezoneSelect.innerHTML = '<option value="">First select your country above</option>';
+                    timezoneHelper.textContent = 'Please select a country first';
+                    timezoneHelper.style.color = '#888';
+                }
+            });
+            
+            // Handle day checkbox changes
             dayCheckboxes.forEach(checkbox => {
                 checkbox.addEventListener('change', function() {
                     const day = this.value.toLowerCase();
@@ -780,7 +1102,18 @@
                 });
                 
                 if (subjects.length === 0) {
-                    throw new Error('Please select at least one subject');
+                    // Show validation error modal
+                    showModal(
+                        'error',
+                        'Missing Information ⚠️',
+                        `<strong>Please select at least one subject</strong><br><br>
+                        You need to choose which subjects you'd like help with before submitting your registration.`
+                    );
+                    
+                    // Reset loading state
+                    submitBtn.disabled = false;
+                    loadingIndicator.style.display = 'none';
+                    return; // Stop form submission
                 }
                 
                 // Get preferred times from checkboxes
@@ -830,44 +1163,44 @@
                 const result = await response.json();
                 
                 if (result.success) {
-                    // Show success message prominently
-                    alertContainer.innerHTML = `
-                        <div class="alert alert-success">
-                            <i class="fas fa-check-circle"></i> <strong>Registration Successful!</strong><br>
-                            ${result.message}
-                        </div>
-                    `;
-                    
-                    // Update submit button to show success
-                    submitBtn.innerHTML = '<i class="fas fa-check"></i> Registration Complete!';
-                    submitBtn.style.background = '#28a745';
-                    
-                    // Reset form after showing success
-                    setTimeout(() => {
-                        this.reset();
-                        submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Registration';
-                        submitBtn.style.background = '';
-                    }, 3000);
-                    
-                    // Scroll to top to show message
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                    
-                    // Also scroll the alert into view after a brief delay
-                    setTimeout(() => {
-                        alertContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }, 300);
+                    // Show success modal
+                    showModal(
+                        'success',
+                        'Registration Successful! 🎉',
+                        `<strong>${result.message}</strong><br><br>
+                        ✅ We've received your registration<br>
+                        📧 <strong>Check your email for confirmation</strong><br>
+                        📞 We'll contact you within 24 hours<br>
+                        🎁 <strong>Your first session is FREE!</strong><br><br>
+                        <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px; padding: 10px; margin-top: 15px;">
+                        <strong>📨 Important:</strong> If you don't see our email in your inbox:<br>
+                        • Check your <strong>Spam/Junk folder</strong><br>
+                        • Add <strong>khan.apcalculus@gmail.com</strong> to your contacts<br>
+                        • Look for email from <strong>"LCC360 Tutoring"</strong>
+                        </div>`,
+                        () => {
+                            // Reset form when modal is closed
+                            this.reset();
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }
+                    );
                 } else {
                     throw new Error(result.message || 'Registration failed');
                 }
                 
             } catch (error) {
                 console.error('Registration error:', error);
-                alertContainer.innerHTML = `
-                    <div class="alert alert-error">
-                        <i class="fas fa-exclamation-triangle"></i> ${error.message}
-                    </div>
-                `;
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                
+                // Show error modal
+                showModal(
+                    'error',
+                    'Registration Failed ❌',
+                    `<strong>Oops! Something went wrong:</strong><br><br>
+                    ${error.message}<br><br>
+                    Please try again or contact us directly:<br>
+                    📧 khan.apcalculus@gmail.com<br>
+                    📱 714-400-8283`
+                );
             } finally {
                 submitBtn.disabled = false;
                 loadingIndicator.style.display = 'none';
