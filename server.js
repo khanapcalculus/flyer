@@ -125,6 +125,9 @@ const studentSchema = new mongoose.Schema({
 const Student = mongoose.model('Student', studentSchema);
 
 // Email configuration
+console.log('Email User:', process.env.EMAIL_USER ? 'Set' : 'Not set');
+console.log('Email Pass:', process.env.EMAIL_PASS ? 'Set' : 'Not set');
+
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
