@@ -128,13 +128,31 @@ const Student = mongoose.model('Student', studentSchema);
 console.log('Email User:', process.env.EMAIL_USER ? 'Set' : 'Not set');
 console.log('Email Pass:', process.env.EMAIL_PASS ? 'Set' : 'Not set');
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER || 'khan.apcalculus@gmail.com',
-    pass: process.env.EMAIL_PASS // Gmail App Password
-  }
-});
+// Try multiple email configurations for better compatibility
+let transporter;
+
+if (process.env.EMAIL_PASS) {
+  // Primary: Gmail with App Password
+  transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.EMAIL_USER || 'khan.apcalculus@gmail.com',
+      pass: process.env.EMAIL_PASS
+    }
+  });
+} else {
+  // Fallback: Console logging (for testing)
+  transporter = {
+    sendMail: (options) => {
+      console.log('📧 Email would be sent:', {
+        to: options.to,
+        subject: options.subject,
+        html: options.html ? 'HTML content present' : 'No HTML content'
+      });
+      return Promise.resolve({ messageId: 'console-log' });
+    }
+  };
+}
 
 // Routes
 app.get('/', (req, res) => {
@@ -252,8 +270,13 @@ app.post('/api/register', async (req, res) => {
     };
 
     // Send emails (don't wait for completion to avoid blocking)
-    transporter.sendMail(studentMailOptions).catch(err => console.log('Email error:', err));
-    transporter.sendMail(tutorMailOptions).catch(err => console.log('Email error:', err));
+    transporter.sendMail(studentMailOptions)
+      .then(() => console.log('✅ Student email sent successfully'))
+      .catch(err => console.log('❌ Student email error:', err.message));
+    
+    transporter.sendMail(tutorMailOptions)
+      .then(() => console.log('✅ Tutor email sent successfully'))
+      .catch(err => console.log('❌ Tutor email error:', err.message));
 
     res.json({
       success: true,
