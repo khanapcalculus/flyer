@@ -7,7 +7,7 @@ MONGODB_URI=mongodb+srv://khanapcalculus:Thazhath12@cluster0.ipy6r.mongodb.net/t
 
 # Email Configuration
 EMAIL_USER=khan.apcalculus@gmail.com
-EMAIL_PASS=your_gmail_app_password_here
+EMAIL_PASS=alphabeta12#
 
 # Server Configuration
 PORT=3000
