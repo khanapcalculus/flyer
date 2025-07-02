@@ -127,32 +127,25 @@ const Student = mongoose.model('Student', studentSchema);
 // Email configuration
 console.log('Email User:', process.env.EMAIL_USER ? 'Set' : 'Not set');
 console.log('Email Pass:', process.env.EMAIL_PASS ? 'Set' : 'Not set');
+console.log('EMAIL_PASS value preview:', process.env.EMAIL_PASS ? process.env.EMAIL_PASS.substring(0, 4) + '****' : 'undefined');
 
-// Try multiple email configurations for better compatibility
-let transporter;
+// Force Gmail configuration (for debugging)
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'khan.apcalculus@gmail.com',
+    pass: process.env.EMAIL_PASS
+  }
+});
 
-if (process.env.EMAIL_PASS) {
-  // Primary: Gmail with App Password
-  transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.EMAIL_USER || 'khan.apcalculus@gmail.com',
-      pass: process.env.EMAIL_PASS
-    }
-  });
-} else {
-  // Fallback: Console logging (for testing)
-  transporter = {
-    sendMail: (options) => {
-      console.log('📧 Email would be sent:', {
-        to: options.to,
-        subject: options.subject,
-        html: options.html ? 'HTML content present' : 'No HTML content'
-      });
-      return Promise.resolve({ messageId: 'console-log' });
-    }
-  };
-}
+// Test email configuration
+transporter.verify((error, success) => {
+  if (error) {
+    console.log('❌ Email configuration error:', error.message);
+  } else {
+    console.log('✅ Email server ready to send messages');
+  }
+});
 
 // Routes
 app.get('/', (req, res) => {
