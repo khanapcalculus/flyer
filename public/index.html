@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expert Math Tutoring - LCC360</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.cdnfonts.com/css/caviar-dreams" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Caviar Dreams', 'Quicksand', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            padding-bottom: 80px;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .hero-content {
+            max-width: 800px;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: #002147;
+            border: 1px solid #003366;
+            color: white;
+            box-shadow: 0 8px 32px rgba(0, 33, 71, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(255, 255, 255, 0.1);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary:hover {
+            background: #003366;
+            border: 1px solid #004488;
+            box-shadow: 0 15px 35px rgba(0, 33, 71, 0.5);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 15px 35px rgba(255, 255, 255, 0.2);
+        }
+
+        .features {
+            padding: 80px 20px;
+            background: #f8f9ff;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin-top: 50px;
+        }
+
+        .feature-card {
+            background: #002147;
+            border: 1px solid #003366;
+            color: white;
+            padding: 40px 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 33, 71, 0.4);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            background: #003366;
+            border: 1px solid #004488;
+            box-shadow: 0 15px 40px rgba(0, 33, 71, 0.5);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            color: #f093fb;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        .feature-card p {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .floating-register {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+            background: #002147;
+            border: 2px solid #003366;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            box-shadow: 0 10px 30px rgba(0, 33, 71, 0.5);
+            transition: all 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+
+        .floating-register:hover {
+            background: #003366;
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 33, 71, 0.6);
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 10px 30px rgba(0, 33, 71, 0.5); }
+            50% { box-shadow: 0 10px 30px rgba(0, 33, 71, 0.7); }
+            100% { box-shadow: 0 10px 30px rgba(0, 33, 71, 0.5); }
+        }
+
+        .contact-section {
+            padding: 80px 20px 120px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .contact-item {
+            background: #002147;
+            border: 1px solid #003366;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 33, 71, 0.3);
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #764ba2;
+        }
+
+        .features .section-title {
+            color: #764ba2;
+        }
+
+        .contact-section .section-title {
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .floating-register {
+                bottom: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                font-size: 1rem;
+            }
+
+            .contact-section {
+                padding: 60px 20px 100px 20px;
+            }
+
+            body {
+                padding-bottom: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <section class="hero">
+        <div class="hero-content">
+            <h1>🎓 Expert Math Tutoring</h1>
+            <p>13 Years of Excellence in Mathematics Education<br>
+            One-on-One Online Sessions • Affordable Rates • Proven Results</p>
+            <div class="cta-buttons">
+                <a href="/register" class="btn btn-primary">
+                    <i class="fas fa-user-plus"></i> Register Now
+                </a>
+                <a href="/flyer" class="btn btn-secondary">
+                    <i class="fas fa-eye"></i> View Flyer
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="container">
+            <h2 class="section-title">Why Choose Our Tutoring?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h3>13+ Years Experience</h3>
+                    <p>Proven track record of helping students excel in mathematics with over a decade of teaching experience.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-calculator"></i>
+                    </div>
+                    <h3>Comprehensive Math Subjects</h3>
+                    <p>From Algebra to AP Calculus, IB Math, Statistics, and advanced topics like Multivariable Calculus.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-laptop"></i>
+                    </div>
+                    <h3>Online One-on-One</h3>
+                    <p>Personalized attention through individual online sessions tailored to your learning style and pace.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <h3>Affordable Rates</h3>
+                    <p>Quality education at competitive hourly rates, making expert tutoring accessible to all students.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Subject Network</h3>
+                    <p>Access to qualified tutors in other subjects like Biology, Chemistry, Physics, and English.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <h3>Proven Results</h3>
+                    <p>Students consistently improve grades and gain confidence in mathematics through our methods.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="contact-section">
+        <div class="container">
+            <h2 class="section-title">Get Started Today!</h2>
+            <p style="font-size: 1.2rem; margin-bottom: 40px;">
+                Ready to excel in mathematics? Contact us to schedule your first session.
+            </p>
+            
+            <div class="contact-grid">
+                <div class="contact-item">
+                    <i class="fas fa-phone" style="font-size: 2rem; margin-bottom: 15px;"></i>
+                    <h3>Phone & WhatsApp</h3>
+                    <p style="font-size: 1.2rem; font-weight: 600;">714-400-8283</p>
+                </div>
+                
+                <div class="contact-item">
+                    <i class="fas fa-envelope" style="font-size: 2rem; margin-bottom: 15px;"></i>
+                    <h3>Email</h3>
+                    <p style="font-size: 1.2rem; font-weight: 600;">khan.apcalculus@gmail.com</p>
+                </div>
+                
+                <div class="contact-item">
+                    <i class="fas fa-globe" style="font-size: 2rem; margin-bottom: 15px;"></i>
+                    <h3>Website</h3>
+                    <p style="font-size: 1.2rem; font-weight: 600;">www.lcc360.com</p>
+                </div>
+            </div>
+            
+            <div style="margin-top: 40px;">
+                <a href="/register" class="btn btn-primary" style="font-size: 1.3rem; padding: 20px 50px;">
+                    <i class="fas fa-rocket"></i> Start Your Journey Now!
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Floating Registration Button -->
+    <a href="/register" class="floating-register">
+        <i class="fas fa-graduation-cap"></i> Register Now!
+    </a>
+</body>
+</html> 

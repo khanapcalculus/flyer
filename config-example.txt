@@ -1,0 +1,34 @@
+# Environment Variables Configuration
+
+Create a file named ".env" in the root directory with these variables:
+
+# MongoDB Configuration - Your MongoDB Atlas Connection
+MONGODB_URI=mongodb+srv://khanapcalculus:Thazhath12@cluster0.ipy6r.mongodb.net/tutoring_db
+
+# Email Configuration
+EMAIL_USER=khan.apcalculus@gmail.com
+EMAIL_PASS=your_gmail_app_password_here
+
+# Server Configuration
+PORT=3000
+
+# Environment
+NODE_ENV=production
+
+# Instructions:
+# 1. Create a new file named ".env" in the root directory
+# 2. Copy the content above into that file
+# 3. Replace "your_gmail_app_password_here" with your actual Gmail app password
+# 4. Save the file and run "npm start"
+
+# Gmail App Password Setup:
+# 1. Go to your Google Account settings (myaccount.google.com)
+# 2. Click "Security" in the left sidebar
+# 3. Enable 2-factor authentication if not already enabled
+# 4. Go to "App passwords" section
+# 5. Generate a new app password for "Mail"
+# 6. Use this 16-character password in EMAIL_PASS (not your regular Gmail password)
+
+# Your MongoDB Atlas is ready to use!
+# The connection string includes your database credentials and will create
+# a database called "tutoring_db" to store all student registrations. 
