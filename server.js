@@ -103,7 +103,11 @@ const studentSchema = new mongoose.Schema({
       'Algebra', 'Geometry', 'Pre-Calculus', 'Calculus', 
       'AP Calculus AB', 'AP Calculus BC', 'AP Statistics',
       'Linear Algebra', 'Multivariable Calculus', 'Differential Equations',
-      'IB Math HL', 'IB Math SL', 'Biology', 'Chemistry', 'Physics', 'English'
+      'IB Math HL', 'IB Math SL', 
+      'Biology', 'AP Biology',
+      'Chemistry', 'AP Chemistry',
+      'Physics', 'AP Physics 1', 'AP Physics 2', 'AP Physics C (Mechanics)', 'AP Physics C (E&M)',
+      'English', 'AP English Language', 'AP English Literature'
     ]
   }],
   preferredTimes: [{
