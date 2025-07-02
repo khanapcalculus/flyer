@@ -258,7 +258,7 @@ app.post('/api/register', async (req, res) => {
             <h1 style="color: white; margin: 0; font-size: 1.5rem; text-shadow: 1px 1px 3px rgba(0,0,0,0.3);">Learning Coach Center Tutoring</h1>
           </div>
           <h2 style="color: #1e3c72;">Welcome ${firstName}!</h2>
-          <p>Thank you for registering for our tutoring services. We're excited to help you excel in mathematics!</p>
+          <p>Thank you for registering for our tutoring services. We're excited to help you excel in ${subjects.length === 1 ? subjects[0] : subjects.slice(0, -1).join(', ') + ' and ' + subjects[subjects.length - 1]}!</p>
           <h3>Your Registration Details:</h3>
           <ul>
             <li><strong>Name:</strong> ${firstName} ${lastName}</li>
