@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Registration - Expert Math Tutoring</title>
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.cdnfonts.com/css/caviar-dreams" rel="stylesheet">
+    <title>Student Registration - Learning Coach Center Tutoring</title>
+    <!-- Gill Sans MT is a system font, no external imports needed -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
@@ -15,7 +14,7 @@
         }
 
         body {
-            font-family: 'Caviar Dreams', 'Quicksand', sans-serif;
+            font-family: 'Gill Sans MT', 'Gill Sans', 'Calibri', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
             min-height: 100vh;
             padding: 20px 20px 60px 20px;
@@ -45,6 +44,20 @@
         .header p {
             font-size: 1.1rem;
             opacity: 0.9;
+        }
+
+        .logo-container {
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            max-width: 120px;
+            max-height: 80px;
+            width: auto;
+            height: auto;
+            filter: brightness(1.1) contrast(1.1);
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
         }
 
         .form-container {
@@ -97,7 +110,7 @@
             border-radius: 10px;
             font-size: 1rem;
             transition: border-color 0.3s ease;
-            font-family: 'Caviar Dreams', 'Quicksand', sans-serif;
+            font-family: 'Gill Sans MT', 'Gill Sans', 'Calibri', sans-serif;
         }
 
         .form-control:focus {
@@ -149,7 +162,7 @@
             transition: all 0.3s ease;
             border: none;
             cursor: pointer;
-            font-family: 'Caviar Dreams', 'Quicksand', sans-serif;
+            font-family: 'Gill Sans MT', 'Gill Sans', 'Calibri', sans-serif;
         }
 
         .btn-primary {
@@ -263,6 +276,9 @@
 <body>
     <div class="container">
         <div class="header">
+            <div class="logo-container">
+                                 <img src="/logo.png" alt="Learning Coach Center Tutoring Logo" class="logo" onerror="this.style.display='none'">
+            </div>
             <h1>🎓 Student Registration</h1>
             <p>Join our expert tutoring program and excel in mathematics!</p>
         </div>

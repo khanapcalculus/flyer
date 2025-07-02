@@ -7,6 +7,7 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
+const twilio = require('twilio');
 require('dotenv').config();
 
 const app = express();
@@ -20,9 +21,9 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com", "https://fonts.cdnfonts.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"],
       scriptSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"],
-      fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com", "https://fonts.cdnfonts.com"],
+      fontSrc: ["'self'", "https://cdnjs.cloudflare.com"],
       imgSrc: ["'self'", "data:", "https:"],
       connectSrc: ["'self'"]
     }
@@ -32,6 +33,11 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
+
+// Serve logo from root directory
+app.get('/logo.png', (req, res) => {
+  res.sendFile(__dirname + '/logo.png');
+});
 
 // Rate limiting
 const limiter = rateLimit({
@@ -147,6 +153,38 @@ transporter.verify((error, success) => {
   }
 });
 
+// WhatsApp configuration
+console.log('Twilio SID:', process.env.TWILIO_ACCOUNT_SID ? 'Set' : 'Not set');
+console.log('Twilio Token:', process.env.TWILIO_AUTH_TOKEN ? 'Set' : 'Not set');
+
+let twilioClient = null;
+if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
+  twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+  console.log('✅ WhatsApp client initialized');
+} else {
+  console.log('⚠️ WhatsApp disabled (Twilio credentials not provided)');
+}
+
+// Function to send WhatsApp notification
+async function sendWhatsAppNotification(message) {
+  if (!twilioClient) {
+    console.log('📱 WhatsApp would be sent:', message);
+    return;
+  }
+  
+  try {
+    const result = await twilioClient.messages.create({
+      from: 'whatsapp:+14155238886', // Twilio Sandbox number
+      to: 'whatsapp:+17144008283',   // Your number
+      body: message
+    });
+    console.log('✅ WhatsApp sent successfully:', result.sid);
+    return result;
+  } catch (error) {
+    console.log('❌ WhatsApp error:', error.message);
+  }
+}
+
 // Routes
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/public/index.html');
@@ -208,9 +246,13 @@ app.post('/api/register', async (req, res) => {
     const studentMailOptions = {
       from: process.env.EMAIL_USER || 'khan.apcalculus@gmail.com',
       to: email,
-      subject: '🎓 Welcome to Expert Math Tutoring!',
+      subject: '🎓 Welcome to Learning Coach Center Tutoring!',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="text-align: center; margin-bottom: 30px; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%); border-radius: 10px;">
+            <img src="https://flyer-e3c2.onrender.com/logo.png" alt="Learning Coach Center Tutoring" style="max-width: 120px; height: auto; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+            <h1 style="color: white; margin: 0; font-size: 1.5rem; text-shadow: 1px 1px 3px rgba(0,0,0,0.3);">Learning Coach Center Tutoring</h1>
+          </div>
           <h2 style="color: #1e3c72;">Welcome ${firstName}!</h2>
           <p>Thank you for registering for our tutoring services. We're excited to help you excel in mathematics!</p>
           <h3>Your Registration Details:</h3>
@@ -225,8 +267,9 @@ app.post('/api/register', async (req, res) => {
             <li>Phone: 714-400-8283</li>
             <li>Email: khan.apcalculus@gmail.com</li>
             <li>Website: www.lcc360.com</li>
+            <li>Address: 117 Bernal Road Suite 227, Silicon Valley, CA 95119 USA</li>
           </ul>
-          <p>Best regards,<br>Expert Math Tutoring Team</p>
+          <p>Best regards,<br>Learning Coach Center Tutoring Team</p>
         </div>
       `
     };
@@ -238,6 +281,10 @@ app.post('/api/register', async (req, res) => {
       subject: '🔔 New Student Registration',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="text-align: center; margin-bottom: 30px; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%); border-radius: 10px;">
+            <img src="https://flyer-e3c2.onrender.com/logo.png" alt="Learning Coach Center Tutoring" style="max-width: 120px; height: auto; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+            <h1 style="color: white; margin: 0; font-size: 1.5rem; text-shadow: 1px 1px 3px rgba(0,0,0,0.3);">Learning Coach Center Tutoring</h1>
+          </div>
           <h2 style="color: #1e3c72;">New Student Registration</h2>
           <h3>Student Details:</h3>
           <ul>
