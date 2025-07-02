@@ -387,7 +387,7 @@ app.post('/api/register', async (req, res) => {
         <div style="font-family: Arial, sans-serif; max-width: 650px; margin: 0 auto; line-height: 1.6;">
           <div style="text-align: center; margin-bottom: 30px; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%); border-radius: 10px;">
             <img src="https://flyer-e3c2.onrender.com/logo.png" alt="LCC360 Tutoring" style="max-width: 120px; height: auto; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
-            <h1 style="color: white; margin: 0; font-size: 1.5rem; text-shadow: 1px 1px 3px rgba(0,0,0,0.3);">LCC360 - Learning Coach Center</h1>
+            <h1 style="color: white; margin: 0; font-size: 1.5rem; font-family: 'Gill Sans MT', 'Gill Sans', 'Calibri', sans-serif; font-weight: 400; text-shadow: 1px 1px 3px rgba(0,0,0,0.3);">LEARNING COACH CENTER TUTORING</h1>
           </div>
           
           <p style="font-size: 16px; margin-bottom: 20px;">Dear ${recipientName},</p>
@@ -400,12 +400,11 @@ app.post('/api/register', async (req, res) => {
             <p style="margin: 0; font-size: 16px;"><strong>📚 ${subjects.join(', ')}</strong></p>
           </div>
           
-          ${aiPersonalizedMessage ? `
-          <div style="background: #fff4e6; border: 1px solid #ffd700; border-radius: 8px; padding: 15px; margin: 20px 0;">
-            <p style="margin: 0; font-size: 16px; color: #b8860b;"><strong>🎯 Personalized for ${firstName}:</strong></p>
-            <p style="margin: 10px 0 0 0; font-size: 16px;">${aiPersonalizedMessage}</p>
-          </div>
-          ` : ''}
+                     ${aiPersonalizedMessage ? `
+           <div style="background: #fff4e6; border: 1px solid #ffd700; border-radius: 8px; padding: 15px; margin: 20px 0;">
+             <p style="margin: 0; font-size: 16px;">${aiPersonalizedMessage}</p>
+           </div>
+           ` : ''}
           
           <p style="font-size: 16px;">Whether ${isParentEmail ? 'your child' : 'you'} need help mastering the fundamentals or preparing for advanced university-level concepts, we're here to guide ${isParentEmail ? 'them' : 'you'} every step of the way.</p>
           
@@ -417,35 +416,27 @@ app.post('/api/register', async (req, res) => {
             <li><strong>Progress Updates:</strong> You'll receive regular feedback on performance and improvement.</li>
           </ul>
           
-          <h3 style="color: #1e3c72; margin-top: 30px;">📅 What Happens Next?</h3>
-          <p style="font-size: 16px;">We'll contact you shortly to schedule the first session. You can always reach us at the contact information below.</p>
-          
-          <div style="background: #e8f5e8; border: 1px solid #4caf50; border-radius: 8px; padding: 15px; margin: 20px 0; text-align: center;">
-            <h3 style="color: #2e7d32; margin: 0 0 10px 0;">🎁 First Session Is Always Free!</h3>
-            <p style="margin: 0; font-size: 16px;">We believe in letting our teaching speak for itself — ${isParentEmail ? 'your child\'s' : 'your'} first session is complimentary, with no obligations.</p>
-          </div>
-          
-          <div style="background: #002147; color: white; padding: 20px; border-radius: 10px; margin: 30px 0;">
-            <h3 style="color: white; margin-top: 0;">📞 Contact Information</h3>
-            <ul style="list-style: none; padding: 0;">
-              <li style="margin-bottom: 8px;">📱 Phone & WhatsApp: 714-400-8283</li>
-              <li style="margin-bottom: 8px;">📧 Email: khan.apcalculus@gmail.com</li>
-              <li style="margin-bottom: 8px;">🌐 Website: www.lcc360.com</li>
-              <li style="margin-bottom: 8px;">📍 Address: 117 Bernal Road Suite 227, Silicon Valley, CA 95119 USA</li>
-            </ul>
-          </div>
+                     <h3 style="color: #1e3c72; margin-top: 30px;">📅 What Happens Next?</h3>
+           <p style="font-size: 16px;">We'll contact you shortly to schedule the first session.</p>
+           
+           <div style="background: #e8f5e8; border: 1px solid #4caf50; border-radius: 8px; padding: 15px; margin: 20px 0; text-align: center;">
+             <h3 style="color: #2e7d32; margin: 0 0 10px 0;">🎁 First Session Is Always Free!</h3>
+             <p style="margin: 0; font-size: 16px;">We believe in letting our teaching speak for itself — ${isParentEmail ? 'your child\'s' : 'your'} first session is complimentary, with no obligations.</p>
+           </div>
           
           <p style="font-size: 16px; margin-top: 30px;">💬 <strong>Stay Connected:</strong> We're committed to transparency and partnership with ${isParentEmail ? 'parents' : 'students'}. Please don't hesitate to contact us at any time with questions or feedback.</p>
           
           <p style="font-size: 16px; margin-top: 20px;">Welcome again to <strong>LCC360 Tutoring</strong> — we're honored to be part of ${isParentEmail ? 'your child\'s' : 'your'} academic journey.</p>
           
-          <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee;">
-            <p style="margin: 0; font-size: 16px;"><strong>Warm regards,</strong></p>
-            <p style="margin: 5px 0;"><strong>Amjath Kabeer</strong><br>
-            Founder & Lead Instructor<br>
-            📧 khan.apcalculus@gmail.com<br>
-            🌐 www.lcc360.com</p>
-          </div>
+                     <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee;">
+             <p style="margin: 0; font-size: 16px;"><strong>Warm regards,</strong></p>
+             <p style="margin: 5px 0;"><strong>Amjad Khan</strong><br>
+             Founder & Lead Instructor<br>
+             📧 khan.apcalculus@gmail.com<br>
+             🌐 www.lcc360.com<br>
+             📱 714-400-8283<br>
+             📍 117 Bernal Road Suite 227, Silicon Valley, CA 95119 USA</p>
+           </div>
         </div>
       `
     };
