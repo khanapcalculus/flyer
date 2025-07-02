@@ -288,6 +288,93 @@
             color: white;
             border: 2px solid #003366;
         }
+
+        /* Print styles for PDF generation */
+        @media print {
+            body {
+                padding: 0;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%) !important;
+                -webkit-print-color-adjust: exact;
+                color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            .flyer {
+                box-shadow: none !important;
+                margin: 0 !important;
+                page-break-inside: avoid;
+            }
+            
+            .header {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%) !important;
+                -webkit-print-color-adjust: exact;
+                color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            .subject-item {
+                background: #002147 !important;
+                color: white !important;
+                border: 1px solid #003366 !important;
+                -webkit-print-color-adjust: exact;
+                color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            .other-subjects {
+                background: #002147 !important;
+                color: white !important;
+                border: 1px solid #003366 !important;
+                -webkit-print-color-adjust: exact;
+                color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            .contact-item {
+                background: #002147 !important;
+                color: white !important;
+                border: 1px solid #003366 !important;
+                border-left: 4px solid #004488 !important;
+                -webkit-print-color-adjust: exact;
+                color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            .highlight {
+                background: linear-gradient(135deg, #CC6600 0%, #FFD700 100%) !important;
+                border: 2px solid #B8860B !important;
+                -webkit-print-color-adjust: exact;
+                color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            .cta {
+                background: #002147 !important;
+                color: white !important;
+                border: 1px solid #003366 !important;
+                -webkit-print-color-adjust: exact;
+                color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            .register-button {
+                background: #002147 !important;
+                color: white !important;
+                border: 2px solid #003366 !important;
+                -webkit-print-color-adjust: exact;
+                color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            .register-button.white-variant {
+                background: white !important;
+                color: #002147 !important;
+                border: 2px solid #002147 !important;
+                -webkit-print-color-adjust: exact;
+                color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
     </style>
 </head>
 <body>
