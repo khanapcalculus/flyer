@@ -15,4 +15,8 @@ services:
       - key: EMAIL_USER
         value: khan.apcalculus@gmail.com
       - key: EMAIL_PASS
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
         sync: false 

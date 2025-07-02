@@ -9,6 +9,13 @@ MONGODB_URI=mongodb+srv://khanapcalculus:Thazhath12@cluster0.ipy6r.mongodb.net/t
 EMAIL_USER=khan.apcalculus@gmail.com
 EMAIL_PASS=roxd gmja tsog hcqw
 
+# AI Configuration (for AI-powered personalized emails)
+# Google Gemini API (FREE - Recommended)
+GEMINI_API_KEY=your_google_gemini_api_key_here
+
+# OpenAI API (PAID - Backup option)
+OPENAI_API_KEY=your_openai_api_key_here
+
 # Server Configuration
 PORT=3000
 
@@ -19,7 +26,9 @@ NODE_ENV=production
 # 1. Create a new file named ".env" in the root directory
 # 2. Copy the content above into that file
 # 3. Replace "your_gmail_app_password_here" with your actual Gmail app password
-# 4. Save the file and run "npm start"
+# 4. Replace "your_google_gemini_api_key_here" with your FREE Google Gemini API key (recommended)
+# 5. Optionally add OpenAI API key for backup (paid service)
+# 6. Save the file and run "npm start"
 
 # Gmail App Password Setup:
 # 1. Go to your Google Account settings (myaccount.google.com)
@@ -31,4 +40,29 @@ NODE_ENV=production
 
 # Your MongoDB Atlas is ready to use!
 # The connection string includes your database credentials and will create
-# a database called "tutoring_db" to store all student registrations. 
+# a database called "tutoring_db" to store all student registrations.
+
+# Google Gemini API Key Setup (FREE - Recommended for AI features):
+# 1. Go to https://aistudio.google.com/app/apikey
+# 2. Sign in with your Google account
+# 3. Click "Create API Key"
+# 4. Copy the API key (starts with "AIza...")
+# 5. Add it to GEMINI_API_KEY in your .env file
+# 6. FREE LIMITS: 15 requests per minute, 1,500 requests per day
+# 7. The system will automatically generate personalized welcome messages
+#    based on student goals and experience
+
+# OpenAI API Key Setup (Optional PAID backup):
+# 1. Go to https://platform.openai.com/api-keys
+# 2. Sign up for an OpenAI account if you don't have one
+# 3. Click "Create new secret key"
+# 4. Copy the API key (starts with "sk-...")
+# 5. Add it to OPENAI_API_KEY in your .env file
+# 6. PAID SERVICE: ~$0.001-0.002 per email (very cheap)
+# 7. Used as backup if Gemini fails
+
+# AI System Behavior:
+# - If GEMINI_API_KEY is provided: Uses FREE Google Gemini first
+# - If Gemini fails and OPENAI_API_KEY is provided: Falls back to OpenAI
+# - If no AI keys provided: Uses professional standard welcome template
+# - AI generates content only when student provides Goals & Experience 

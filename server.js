@@ -8,6 +8,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const twilio = require('twilio');
+const OpenAI = require('openai');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 require('dotenv').config();
 
 const app = express();
@@ -157,6 +159,92 @@ transporter.verify((error, success) => {
   }
 });
 
+// AI Configuration
+console.log('Google Gemini API Key:', process.env.GEMINI_API_KEY ? 'Set' : 'Not set');
+console.log('OpenAI API Key:', process.env.OPENAI_API_KEY ? 'Set' : 'Not set');
+
+let gemini = null;
+let openai = null;
+
+// Initialize Google Gemini (FREE)
+if (process.env.GEMINI_API_KEY) {
+  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+  gemini = genAI.getGenerativeModel({ model: "gemini-pro" });
+  console.log('✅ Google Gemini client initialized (FREE)');
+} else {
+  console.log('⚠️ Google Gemini disabled (API key not provided)');
+}
+
+// Initialize OpenAI (PAID BACKUP)
+if (process.env.OPENAI_API_KEY) {
+  openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY
+  });
+  console.log('✅ OpenAI client initialized (PAID BACKUP)');
+} else {
+  console.log('⚠️ OpenAI disabled (API key not provided)');
+}
+
+// Function to generate personalized AI content
+async function generatePersonalizedMessage(firstName, subjects, goals, experience, grade) {
+  if ((!gemini && !openai) || (!goals && !experience)) {
+    return null; // Return null to use default template
+  }
+
+  const prompt = `Create a personalized, warm, and encouraging paragraph for a welcome email to a ${grade} student named ${firstName} who registered for tutoring in: ${subjects.join(', ')}. 
+
+Student's goals: ${goals || 'Not specified'}
+Student's experience/challenges: ${experience || 'Not specified'}
+
+The paragraph should:
+- Be encouraging and supportive
+- Address their specific goals and challenges
+- Show understanding of their subjects
+- Be professional but warm
+- Be 2-3 sentences long
+- Start with something like "Based on your goals..."
+
+Write only the paragraph, no additional formatting.`;
+
+  // Try Google Gemini first (FREE)
+  if (gemini) {
+    try {
+      console.log('🤖 Generating personalized message with Google Gemini (FREE)...');
+      const result = await gemini.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
+      console.log('✅ Gemini generated personalized message');
+      return text.trim();
+    } catch (error) {
+      console.log('❌ Google Gemini error:', error.message);
+      console.log('🔄 Falling back to OpenAI...');
+    }
+  }
+
+  // Fallback to OpenAI if Gemini fails
+  if (openai) {
+    try {
+      console.log('🤖 Generating personalized message with OpenAI (PAID)...');
+      const completion = await openai.chat.completions.create({
+        model: "gpt-3.5-turbo",
+        messages: [{
+          role: "user",
+          content: prompt
+        }],
+        max_tokens: 150,
+        temperature: 0.7
+      });
+      console.log('✅ OpenAI generated personalized message');
+      return completion.choices[0].message.content.trim();
+    } catch (error) {
+      console.log('❌ OpenAI error:', error.message);
+    }
+  }
+
+  console.log('⚠️ Both AI services failed, using default template');
+  return null; // Fall back to default template
+}
+
 // WhatsApp configuration
 console.log('Twilio SID:', process.env.TWILIO_ACCOUNT_SID ? 'Set' : 'Not set');
 console.log('Twilio Token:', process.env.TWILIO_AUTH_TOKEN ? 'Set' : 'Not set');
@@ -246,34 +334,85 @@ app.post('/api/register', async (req, res) => {
 
     await newStudent.save();
 
-    // Send confirmation email to student
+    // Generate AI-powered personalized content
+    const aiPersonalizedMessage = await generatePersonalizedMessage(firstName, subjects, goals, experience, grade);
+    
+    // Determine recipient name (parent if provided, otherwise student)
+    const recipientName = parentName || `${firstName}'s Parent/Guardian`;
+    const isParentEmail = parentName && parentEmail;
+    const emailRecipient = isParentEmail ? parentEmail : email;
+    const subjectLine = isParentEmail ? 
+      `🎓 Welcome to LCC360 - ${firstName}'s Tutoring Registration Confirmed` : 
+      '🎓 Welcome to LCC360 - Your Tutoring Registration Confirmed';
+
+    // Send confirmation email
     const studentMailOptions = {
       from: process.env.EMAIL_USER || 'khan.apcalculus@gmail.com',
-      to: email,
-      subject: '🎓 Welcome to Learning Coach Center Tutoring!',
+      to: emailRecipient,
+      subject: subjectLine,
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="font-family: Arial, sans-serif; max-width: 650px; margin: 0 auto; line-height: 1.6;">
           <div style="text-align: center; margin-bottom: 30px; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%); border-radius: 10px;">
-            <img src="https://flyer-e3c2.onrender.com/logo.png" alt="Learning Coach Center Tutoring" style="max-width: 120px; height: auto; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
-            <h1 style="color: white; margin: 0; font-size: 1.5rem; text-shadow: 1px 1px 3px rgba(0,0,0,0.3);">Learning Coach Center Tutoring</h1>
+            <img src="https://flyer-e3c2.onrender.com/logo.png" alt="LCC360 Tutoring" style="max-width: 120px; height: auto; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+            <h1 style="color: white; margin: 0; font-size: 1.5rem; text-shadow: 1px 1px 3px rgba(0,0,0,0.3);">LCC360 - Learning Coach Center</h1>
           </div>
-          <h2 style="color: #1e3c72;">Welcome ${firstName}!</h2>
-          <p>Thank you for registering for our tutoring services. We're excited to help you excel in ${subjects.length === 1 ? subjects[0] : subjects.slice(0, -1).join(', ') + ' and ' + subjects[subjects.length - 1]}!</p>
-          <h3>Your Registration Details:</h3>
-          <ul>
-            <li><strong>Name:</strong> ${firstName} ${lastName}</li>
-            <li><strong>Grade:</strong> ${grade}</li>
-            <li><strong>Subjects:</strong> ${subjects.join(', ')}</li>
+          
+          <p style="font-size: 16px; margin-bottom: 20px;">Dear ${recipientName},</p>
+          
+          <p style="font-size: 16px;">Thank you for registering with <strong>LCC360</strong> — where world-class math instruction meets personal attention and care. We're thrilled to welcome ${isParentEmail ? 'your child' : 'you'} to our growing community of motivated learners.</p>
+          
+          <p style="font-size: 16px;">You've enrolled ${isParentEmail ? 'your child' : ''} for support in the following subject(s):</p>
+          
+          <div style="background: #f8f9ff; border-left: 4px solid #667eea; padding: 15px; margin: 20px 0;">
+            <p style="margin: 0; font-size: 16px;"><strong>📚 ${subjects.join(', ')}</strong></p>
+          </div>
+          
+          ${aiPersonalizedMessage ? `
+          <div style="background: #fff4e6; border: 1px solid #ffd700; border-radius: 8px; padding: 15px; margin: 20px 0;">
+            <p style="margin: 0; font-size: 16px; color: #b8860b;"><strong>🎯 Personalized for ${firstName}:</strong></p>
+            <p style="margin: 10px 0 0 0; font-size: 16px;">${aiPersonalizedMessage}</p>
+          </div>
+          ` : ''}
+          
+          <p style="font-size: 16px;">Whether ${isParentEmail ? 'your child' : 'you'} need help mastering the fundamentals or preparing for advanced university-level concepts, we're here to guide ${isParentEmail ? 'them' : 'you'} every step of the way.</p>
+          
+          <h3 style="color: #1e3c72; margin-top: 30px;">🧑‍🏫 What You Can Expect</h3>
+          <ul style="font-size: 16px;">
+            <li><strong>Expert Tutors:</strong> Our instructors are highly qualified in subjects like Calculus, Linear Algebra, Differential Equations, and more.</li>
+            <li><strong>Customized Lessons:</strong> Tailored to ${isParentEmail ? 'your child\'s' : 'your'} current level, goals, and school curriculum.</li>
+            <li><strong>Online Convenience:</strong> All sessions are conducted live via Zoom/Google Meet at times that work for U.S. and international students.</li>
+            <li><strong>Progress Updates:</strong> You'll receive regular feedback on performance and improvement.</li>
           </ul>
-          <p>We'll contact you within 24 hours to schedule your first session.</p>
-          <p><strong>Contact Information:</strong></p>
-          <ul>
-            <li>Phone: 714-400-8283</li>
-            <li>Email: khan.apcalculus@gmail.com</li>
-            <li>Website: www.lcc360.com</li>
-            <li>Address: 117 Bernal Road Suite 227, Silicon Valley, CA 95119 USA</li>
-          </ul>
-          <p>Best regards,<br>Learning Coach Center Tutoring Team</p>
+          
+          <h3 style="color: #1e3c72; margin-top: 30px;">📅 What Happens Next?</h3>
+          <p style="font-size: 16px;">We'll contact you shortly to schedule the first session. You can always reach us at the contact information below.</p>
+          
+          <div style="background: #e8f5e8; border: 1px solid #4caf50; border-radius: 8px; padding: 15px; margin: 20px 0; text-align: center;">
+            <h3 style="color: #2e7d32; margin: 0 0 10px 0;">🎁 First Session Is Always Free!</h3>
+            <p style="margin: 0; font-size: 16px;">We believe in letting our teaching speak for itself — ${isParentEmail ? 'your child\'s' : 'your'} first session is complimentary, with no obligations.</p>
+          </div>
+          
+          <div style="background: #002147; color: white; padding: 20px; border-radius: 10px; margin: 30px 0;">
+            <h3 style="color: white; margin-top: 0;">📞 Contact Information</h3>
+            <ul style="list-style: none; padding: 0;">
+              <li style="margin-bottom: 8px;">📱 Phone & WhatsApp: 714-400-8283</li>
+              <li style="margin-bottom: 8px;">📧 Email: khan.apcalculus@gmail.com</li>
+              <li style="margin-bottom: 8px;">🌐 Website: www.lcc360.com</li>
+              <li style="margin-bottom: 8px;">📍 Address: 117 Bernal Road Suite 227, Silicon Valley, CA 95119 USA</li>
+            </ul>
+          </div>
+          
+          <p style="font-size: 16px; margin-top: 30px;">💬 <strong>Stay Connected:</strong> We're committed to transparency and partnership with ${isParentEmail ? 'parents' : 'students'}. Please don't hesitate to contact us at any time with questions or feedback.</p>
+          
+          <p style="font-size: 16px; margin-top: 20px;">Welcome again to <strong>LCC360 Tutoring</strong> — we're honored to be part of ${isParentEmail ? 'your child\'s' : 'your'} academic journey.</p>
+          
+          <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee;">
+            <p style="margin: 0; font-size: 16px;"><strong>Warm regards,</strong></p>
+            <p style="margin: 5px 0;"><strong>Amjath Kabeer</strong><br>
+            Founder & Lead Instructor<br>
+            📧 khan.apcalculus@gmail.com<br>
+            🌐 www.lcc360.com</p>
+          </div>
         </div>
       `
     };
