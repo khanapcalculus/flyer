@@ -412,6 +412,11 @@
             color: #155724;
         }
 
+        .modal-header.warning {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            color: #856404;
+        }
+
         .modal-header.error {
             background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
             color: #721c24;
@@ -468,6 +473,16 @@
             background: #003366;
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(0, 33, 71, 0.4);
+        }
+
+        .modal-btn.warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .modal-btn.warning:hover {
+            background: #e0a800;
+            box-shadow: 0 8px 25px rgba(255, 193, 7, 0.4);
         }
 
         .modal-btn.error {
@@ -983,11 +998,18 @@
                     if (modalIcon) modalIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
                     if (modalTitle) modalTitle.textContent = title;
                     if (modalMessage) modalMessage.innerHTML = message;
+                } else if (type === 'warning') {
+                    console.log('⚠️ Setting up warning modal');
+                    if (modalHeader) modalHeader.classList.add('warning');
+                    if (modalBtn) modalBtn.classList.add('warning');
+                    if (modalIcon) modalIcon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+                    if (modalTitle) modalTitle.textContent = title;
+                    if (modalMessage) modalMessage.innerHTML = message;
                 } else if (type === 'error') {
                     console.log('❌ Setting up error modal');
                     if (modalHeader) modalHeader.classList.add('error');
                     if (modalBtn) modalBtn.classList.add('error');
-                    if (modalIcon) modalIcon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+                    if (modalIcon) modalIcon.innerHTML = '<i class="fas fa-times-circle"></i>';
                     if (modalTitle) modalTitle.textContent = title;
                     if (modalMessage) modalMessage.innerHTML = message;
                 }
@@ -1804,33 +1826,73 @@
                 // Check if response is okay and can be parsed as JSON
                 if (!response.ok) {
                     console.log('❌ Server returned error status:', response.status);
-                    let errorMessage = 'Registration failed. Please try again.';
+                    let errorData = null;
                     
                     try {
-                        const errorData = await response.json();
+                        errorData = await response.json();
                         console.log('📄 Error response data:', errorData);
-                        errorMessage = errorData.message || errorMessage;
                     } catch (parseError) {
                         console.log('⚠️ Could not parse error response as JSON:', parseError);
-                        errorMessage = `Server error (${response.status}): ${response.statusText}`;
+                        // Show generic server error
+                        showModal(
+                            'error',
+                            'Server Error ❌',
+                            `<strong>Unable to connect to server:</strong><br><br>
+                            <div style="background: #ffebee; border: 1px solid #f44336; border-radius: 5px; padding: 15px; margin: 10px 0;">
+                                <strong>Error:</strong> Server error (${response.status}): ${response.statusText}
+                            </div>
+                            <strong>Please try:</strong><br>
+                            • Check your internet connection<br>
+                            • Refresh the page and try again<br>
+                            • Contact us if the problem continues<br><br>
+                            📧 khan.apcalculus@gmail.com<br>
+                            📱 714-400-8283`
+                        );
+                        return;
                     }
                     
-                    // Show specific server error
-                    console.log('🚨 Displaying error modal with message:', errorMessage);
-                    showModal(
-                        'error',
-                        'Registration Failed ❌',
-                        `<strong>Sorry, registration could not be completed:</strong><br><br>
-                        <div style="background: #ffebee; border: 1px solid #f44336; border-radius: 5px; padding: 15px; margin: 10px 0;">
-                            <strong>Error:</strong> ${errorMessage}
-                        </div>
-                        <strong>What you can do:</strong><br>
-                        • Check the information you entered<br>
-                        • Try again in a few moments<br>
-                        • Contact us directly if the problem persists<br><br>
-                        📧 khan.apcalculus@gmail.com<br>
-                        📱 714-400-8283`
-                    );
+                    // Handle validation errors differently than server errors
+                    if (errorData && errorData.type === 'validation') {
+                        console.log('⚠️ Validation errors found, showing user-friendly guidance');
+                        
+                        const errorList = errorData.errors || [];
+                        const errorListHtml = errorList.map(error => `<li style="margin: 5px 0;">${error}</li>`).join('');
+                        
+                        showModal(
+                            'warning',
+                            'Please Check Your Information ⚠️',
+                            `<strong>We found some issues that need your attention:</strong><br><br>
+                            <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px; padding: 15px; margin: 10px 0;">
+                                <ul style="margin: 0; padding-left: 20px; text-align: left;">
+                                    ${errorListHtml}
+                                </ul>
+                            </div>
+                            <strong>What to do next:</strong><br>
+                            • Review the issues listed above<br>
+                            • Make the necessary corrections in the form<br>
+                            • Click "Submit Registration" again<br><br>
+                            <strong>Need help?</strong> Contact us:<br>
+                            📧 khan.apcalculus@gmail.com<br>
+                            📱 714-400-8283`
+                        );
+                    } else {
+                        // Show generic server error for non-validation issues
+                        const errorMessage = errorData?.message || 'Registration failed. Please try again.';
+                        showModal(
+                            'error',
+                            'Registration Failed ❌',
+                            `<strong>Sorry, registration could not be completed:</strong><br><br>
+                            <div style="background: #ffebee; border: 1px solid #f44336; border-radius: 5px; padding: 15px; margin: 10px 0;">
+                                <strong>Error:</strong> ${errorMessage}
+                            </div>
+                            <strong>What you can do:</strong><br>
+                            • Check the information you entered<br>
+                            • Try again in a few moments<br>
+                            • Contact us directly if the problem persists<br><br>
+                            📧 khan.apcalculus@gmail.com<br>
+                            📱 714-400-8283`
+                        );
+                    }
                     return; // Exit early for server errors
                 }
                 
@@ -1862,43 +1924,44 @@
                     );
                 } else {
                     console.log('⚠️ Server returned success=false:', result.message);
-                    // Handle server validation errors (like duplicate email)
-                    const errorMessage = result.message || 'Registration failed due to validation error';
+                    // Handle server issues (non-validation errors)
+                    const errorMessage = result.message || 'Registration failed due to server error';
                     
-                    console.log('🚨 Displaying validation error modal with message:', errorMessage);
+                    console.log('🚨 Displaying server error modal with message:', errorMessage);
                     showModal(
                         'error',
-                        'Registration Error ⚠️',
+                        'Registration Error ❌',
                         `<strong>Unable to complete registration:</strong><br><br>
-                        <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 5px; padding: 15px; margin: 10px 0;">
-                            <strong>Issue:</strong> ${errorMessage}
+                        <div style="background: #ffebee; border: 1px solid #f44336; border-radius: 5px; padding: 15px; margin: 10px 0;">
+                            <strong>Server Issue:</strong> ${errorMessage}
                         </div>
-                        <strong>How to fix this:</strong><br>
-                        • If the email is already registered, try using a different email<br>
-                        • Check that all required fields are filled correctly<br>
-                        • Contact us if you need assistance<br><br>
+                        <strong>What you can do:</strong><br>
+                        • Try submitting again in a few moments<br>
+                        • Check your internet connection<br>
+                        • Contact us if the problem continues<br><br>
                         📧 khan.apcalculus@gmail.com<br>
                         📱 714-400-8283`
                     );
                 }
                 
             } catch (error) {
-                console.error('💥 Unexpected registration error:', error);
+                console.error('💥 Network/Connection error:', error);
                 
-                // This should only catch network errors or unexpected failures
+                // This should only catch network errors, not validation or server errors
                 showModal(
                     'error',
-                    'Connection Error ❌',
-                    `<strong>Unable to connect to server:</strong><br><br>
+                    'Connection Problem ❌',
+                    `<strong>Unable to connect to the server:</strong><br><br>
                     <div style="background: #ffebee; border: 1px solid #f44336; border-radius: 5px; padding: 15px; margin: 10px 0;">
-                        <strong>Error:</strong> ${error.message}
+                        <strong>Network Error:</strong> ${error.message}
                     </div>
-                    <strong>Please try:</strong><br>
+                    <strong>Please try these steps:</strong><br>
                     • Check your internet connection<br>
-                    • Refresh the page and try again<br>
-                    • Contact us if the problem continues<br><br>
+                    • Refresh this page and try again<br>
+                    • If the problem persists, contact us directly<br><br>
                     📧 khan.apcalculus@gmail.com<br>
-                    📱 714-400-8283`
+                    📱 714-400-8283<br><br>
+                    <em>Your information has been saved in the form, so you won't lose your entries.</em>`
                 );
             } finally {
                 submitBtn.disabled = false;

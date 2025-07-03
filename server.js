@@ -25,6 +25,7 @@ app.use(helmet({
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"],
       scriptSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"],
+      scriptSrcAttr: ["'self'", "'unsafe-inline'"],
       fontSrc: ["'self'", "https://cdnjs.cloudflare.com"],
       imgSrc: ["'self'", "data:", "https:"],
       connectSrc: ["'self'"]
@@ -346,6 +347,8 @@ app.get('/flyer', (req, res) => {
 
 // Student registration endpoint
 app.post('/api/register', async (req, res) => {
+  console.log('📝 Registration request received:', req.body);
+  
   try {
     const {
       firstName, lastName, email, phone, grade, country, timezone, subjects,
@@ -353,20 +356,57 @@ app.post('/api/register', async (req, res) => {
       goals, experience
     } = req.body;
 
-    // Validation
-    if (!firstName || !lastName || !email || !phone || !grade || !country || !timezone || !subjects) {
-      return res.status(400).json({
-        success: false,
-        message: 'Please fill in all required fields'
-      });
+    // Validation - collect all errors instead of stopping at first one
+    const validationErrors = [];
+    
+    if (!firstName || firstName.trim().length < 2) {
+      validationErrors.push('First name must be at least 2 characters long');
     }
-
-    // Check if student already exists
-    const existingStudent = await Student.findOne({ email: email.toLowerCase() });
-    if (existingStudent) {
+    
+    if (!lastName || lastName.trim().length < 2) {
+      validationErrors.push('Last name must be at least 2 characters long');
+    }
+    
+    if (!email || !validator.isEmail(email)) {
+      validationErrors.push('Please provide a valid email address');
+    }
+    
+    if (!phone || phone.replace(/[-()\s]/g, '').length < 10) {
+      validationErrors.push('Please provide a valid phone number with at least 10 digits');
+    }
+    
+    if (!grade) {
+      validationErrors.push('Please select your grade level');
+    }
+    
+    if (!country) {
+      validationErrors.push('Please select your country');
+    }
+    
+    if (!timezone) {
+      validationErrors.push('Please select your time zone');
+    }
+    
+    if (!subjects || subjects.length === 0) {
+      validationErrors.push('Please select at least one subject you need help with');
+    }
+    
+    // Check if student already exists (if email is valid)
+    if (email && validator.isEmail(email)) {
+      const existingStudent = await Student.findOne({ email: email.toLowerCase() });
+      if (existingStudent) {
+        validationErrors.push('A student with this email address is already registered. Please use a different email or contact us if you need assistance.');
+      }
+    }
+    
+    // If there are validation errors, return them for user to fix
+    if (validationErrors.length > 0) {
+      console.log('⚠️ Validation errors found:', validationErrors);
       return res.status(400).json({
         success: false,
-        message: 'A student with this email already exists'
+        message: 'Please correct the following issues and try again:',
+        errors: validationErrors,
+        type: 'validation'
       });
     }
 
@@ -389,9 +429,18 @@ app.post('/api/register', async (req, res) => {
     });
 
     await newStudent.save();
+    console.log('✅ Student saved to database successfully');
 
-    // Generate AI-powered personalized content
-    const aiPersonalizedMessage = await generatePersonalizedMessage(firstName, subjects, goals, experience, grade);
+    // Generate AI-powered personalized content (with fallback)
+    let aiPersonalizedMessage = null;
+    try {
+      console.log('🤖 Attempting to generate AI personalized message...');
+      aiPersonalizedMessage = await generatePersonalizedMessage(firstName, subjects, goals, experience, grade);
+      console.log('✅ AI message generated successfully');
+    } catch (aiError) {
+      console.log('⚠️ AI message generation failed, continuing without it:', aiError.message);
+      aiPersonalizedMessage = null; // Continue without AI message
+    }
     
     // Determine recipient name (parent if provided, otherwise student)
     const recipientName = parentName || `${firstName}'s Parent/Guardian`;
@@ -538,6 +587,7 @@ LCC360 - Learning Coach Center Tutoring`,
     };
 
     // Send emails (don't wait for completion to avoid blocking)
+    console.log('📧 Sending confirmation emails...');
     transporter.sendMail(studentMailOptions)
       .then(() => console.log('✅ Student email sent successfully'))
       .catch(err => console.log('❌ Student email error:', err.message));
@@ -546,6 +596,7 @@ LCC360 - Learning Coach Center Tutoring`,
       .then(() => console.log('✅ Tutor email sent successfully'))
       .catch(err => console.log('❌ Tutor email error:', err.message));
 
+    console.log('✅ Registration completed successfully');
     res.json({
       success: true,
       message: 'Registration successful! We\'ll contact you within 24 hours.',
@@ -553,10 +604,27 @@ LCC360 - Learning Coach Center Tutoring`,
     });
 
   } catch (error) {
-    console.error('Registration error:', error);
+    console.error('💥 Registration error details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name,
+      code: error.code
+    });
+    
+    // Send more specific error message based on error type
+    let errorMessage = 'Registration failed. Please try again later.';
+    
+    if (error.name === 'ValidationError') {
+      errorMessage = 'Please check your information and try again.';
+    } else if (error.name === 'MongoError' && error.code === 11000) {
+      errorMessage = 'A student with this email already exists.';
+    } else if (error.name === 'MongoError' || error.name === 'MongooseError') {
+      errorMessage = 'Database error. Please try again later.';
+    }
+    
     res.status(500).json({
       success: false,
-      message: 'Registration failed. Please try again later.'
+      message: errorMessage
     });
   }
 });
