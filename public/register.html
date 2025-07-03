@@ -924,7 +924,15 @@
                         </div>
                         <div class="form-group">
                             <label for="parentPhone">Parent/Guardian Phone</label>
-                            <input type="tel" id="parentPhone" name="parentPhone" class="form-control" placeholder="Include country code if international">
+                            <input type="tel" id="parentPhone" name="parentPhone" class="form-control" placeholder="e.g., 7144008283" 
+                                   maxlength="15" 
+                                   onkeypress="return isDigitOnly(event)"
+                                   oninput="formatPhoneDigits(this)"
+                                   onpaste="handlePhonePaste(event)">
+                            <div class="error-message" id="parentPhone-error"></div>
+                            <div class="field-helper" style="font-size: 12px; color: #666; margin-top: 5px;">
+                                📱 Enter digits only (10-15 digits)
+                            </div>
                         </div>
                     </div>
                     
@@ -1611,6 +1619,27 @@
                 if (!firstErrorField) firstErrorField = 'subjects';
             } else {
                 clearFieldError('subjects');
+            }
+
+            // Parent phone validation (optional) - digits only
+            const parentPhone = document.getElementById('parentPhone').value.trim();
+            if (parentPhone) {
+                const parentPhoneDigits = parentPhone.replace(/\D/g, ''); // Remove all non-digits
+                if (parentPhoneDigits !== parentPhone) {
+                    showFieldError('parentPhone', '❌ Parent phone number must contain digits only (no letters or symbols).');
+                    errors.push('Parent phone number must be digits only');
+                    if (!firstErrorField) firstErrorField = 'parentPhone';
+                } else if (parentPhone.length < 10) {
+                    showFieldError('parentPhone', `❌ Parent phone number too short. You entered ${parentPhone.length} digits, need at least 10.`);
+                    errors.push('Parent phone number needs at least 10 digits');
+                    if (!firstErrorField) firstErrorField = 'parentPhone';
+                } else if (parentPhone.length > 15) {
+                    showFieldError('parentPhone', `❌ Parent phone number too long. You entered ${parentPhone.length} digits, maximum is 15.`);
+                    errors.push('Parent phone number too long (max 15 digits)');
+                    if (!firstErrorField) firstErrorField = 'parentPhone';
+                } else {
+                    clearFieldError('parentPhone');
+                }
             }
 
             // Show validation summary if there are errors

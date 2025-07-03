@@ -129,7 +129,24 @@ const studentSchema = new mongoose.Schema({
   }],
   parentName: String,
   parentEmail: String,
-  parentPhone: String,
+  parentPhone: {
+    type: String,
+    validate: {
+      validator: function(v) {
+        if (!v) return true; // Optional field
+        const digits = v.replace(/\D/g, '');
+        return v === digits && digits.length >= 10 && digits.length <= 15;
+      },
+      message: props => {
+        if (!props.value) return 'Parent phone is optional';
+        const digits = props.value.replace(/\D/g, '');
+        if (props.value !== digits) return 'Parent phone must contain digits only';
+        if (digits.length < 10) return `Parent phone too short (${digits.length} digits). Need at least 10 digits`;
+        if (digits.length > 15) return `Parent phone too long (${digits.length} digits). Maximum 15 digits allowed`;
+        return 'Invalid parent phone number';
+      }
+    }
+  },
   goals: String,
   experience: String,
   registrationDate: {
