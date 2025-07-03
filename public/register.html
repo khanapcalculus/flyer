@@ -130,21 +130,39 @@
         }
 
         .error-message {
-            color: #dc3545;
+            color: #721c24;
             font-size: 14px;
             margin-top: 8px;
             margin-bottom: 10px;
             display: none;
             font-weight: 600;
-            background: #fff5f5;
-            padding: 8px 12px;
-            border-left: 4px solid #dc3545;
-            border-radius: 4px;
+            background: #f8d7da;
+            padding: 12px 15px;
+            border: 2px solid #dc3545;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(220, 53, 69, 0.2);
+            position: relative;
+            z-index: 10;
         }
 
         .error-message.show {
             display: block !important;
-            animation: fadeIn 0.3s ease-in;
+            visibility: visible !important;
+            opacity: 1 !important;
+            animation: errorSlideIn 0.4s ease-out;
+        }
+        
+        @keyframes errorSlideIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(-10px); 
+                max-height: 0;
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+                max-height: 100px;
+            }
         }
 
         @keyframes fadeIn {
@@ -154,15 +172,20 @@
 
         .validation-summary {
             background: #fff3cd;
-            border: 1px solid #ffeaa7;
+            border: 2px solid #ffc107;
             border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
+            padding: 20px;
+            margin: 20px 0;
             display: none;
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+            position: relative;
+            z-index: 100;
         }
 
         .validation-summary.show {
-            display: block;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
             animation: slideDown 0.4s ease-out;
         }
 
@@ -909,8 +932,8 @@
                 </button>
                 
                 <!-- Test validation button (remove in production) -->
-                <button type="button" class="btn btn-secondary" onclick="testValidation()" style="margin-top: 10px; width: 100%;">
-                    🧪 Test Error Display (for debugging)
+                <button type="button" onclick="testValidation()" style="margin-top: 15px; width: 100%; padding: 15px; background: #ffc107; color: #000; border: 2px solid #ffb800; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;">
+                    🧪 CLICK HERE TO TEST ERROR DISPLAY
                 </button>
             </form>
         </div>
@@ -1292,15 +1315,37 @@
             if (field) {
                 field.classList.add('error');
                 field.classList.remove('success');
+                field.style.borderColor = '#dc3545';
+                field.style.backgroundColor = '#fff5f5';
             }
             
             if (errorDiv) {
-                errorDiv.textContent = message;
+                errorDiv.innerHTML = message;
                 errorDiv.classList.add('show');
                 errorDiv.style.display = 'block';
-                console.log('Error div updated for:', fieldId, 'Visible:', errorDiv.offsetHeight > 0);
+                errorDiv.style.visibility = 'visible';
+                errorDiv.style.opacity = '1';
+                errorDiv.style.position = 'relative';
+                errorDiv.style.zIndex = '999';
+                
+                // Force a reflow to ensure the element is rendered
+                errorDiv.offsetHeight;
+                
+                console.log('Error div updated for:', fieldId, 'Visible:', errorDiv.offsetHeight > 0, 'Display:', errorDiv.style.display);
             } else {
-                console.log('Error div not found for field:', fieldId);
+                console.log('ERROR: Error div not found for field:', fieldId);
+                // If error div doesn't exist, create one dynamically
+                if (field && field.parentNode) {
+                    const newErrorDiv = document.createElement('div');
+                    newErrorDiv.id = fieldId + '-error';
+                    newErrorDiv.className = 'error-message show';
+                    newErrorDiv.innerHTML = message;
+                    newErrorDiv.style.display = 'block';
+                    newErrorDiv.style.visibility = 'visible';
+                    newErrorDiv.style.opacity = '1';
+                    field.parentNode.insertBefore(newErrorDiv, field.nextSibling);
+                    console.log('Created new error div for:', fieldId);
+                }
             }
         }
 
@@ -1460,20 +1505,38 @@
 
         // Test function to check if error display is working
         function testValidation() {
-            console.log('Testing validation display...');
-            showFieldError('firstName', '❌ TEST: This is a test error message for first name');
-            showFieldError('email', '❌ TEST: This is a test error message for email');
-            showFieldError('subjects', '❌ TEST: This is a test error message for subjects');
+            console.log('🧪 TESTING VALIDATION DISPLAY...');
             
-            // Test validation summary
-            const validationSummary = document.getElementById('validationSummary');
-            const validationList = document.getElementById('validationList');
+            // Clear any existing errors first
+            clearAllErrors();
             
-            validationList.innerHTML = '<li>Test error 1</li><li>Test error 2</li><li>Test error 3</li>';
-            validationSummary.classList.add('show');
-            validationSummary.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            
-            console.log('Test validation triggered. Check if errors are visible.');
+            // Wait a moment, then show test errors
+            setTimeout(() => {
+                console.log('Showing test errors...');
+                showFieldError('firstName', '🔴 TEST ERROR: First name field - This should be visible on the page!');
+                showFieldError('email', '🔴 TEST ERROR: Email field - This should be visible on the page!');
+                showFieldError('phone', '🔴 TEST ERROR: Phone field - This should be visible on the page!');
+                showFieldError('subjects', '🔴 TEST ERROR: Subjects field - This should be visible on the page!');
+                
+                // Test validation summary
+                const validationSummary = document.getElementById('validationSummary');
+                const validationList = document.getElementById('validationList');
+                
+                if (validationSummary && validationList) {
+                    validationList.innerHTML = '<li>🔴 Test error 1 - This should be visible</li><li>🔴 Test error 2 - In the yellow box at top</li><li>🔴 Test error 3 - With bullet points</li>';
+                    validationSummary.classList.add('show');
+                    validationSummary.style.display = 'block';
+                    validationSummary.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    console.log('✅ Validation summary shown');
+                } else {
+                    console.log('❌ Validation summary elements not found');
+                }
+                
+                // Alert user to look for errors
+                alert('🧪 TEST ERRORS DISPLAYED!\n\nLook for:\n• Red boxes under form fields\n• Yellow warning box at top\n• Check browser console for details');
+                
+                console.log('✅ Test validation complete. Look for red error boxes on the page!');
+            }, 100);
         }
 
         document.getElementById('registrationForm').addEventListener('submit', async function(e) {
