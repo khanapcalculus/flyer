@@ -567,7 +567,7 @@
     <div class="container">
         <div class="header">
             <div class="logo-container">
-                                 <img src="/logo.png" alt="Learning Coach Center Tutoring Logo" class="logo" onerror="this.style.display='none'">
+                                 <img src="/logo.png" alt="Learning Coach Center Tutoring Logo" class="logo" onload="console.log('Logo loaded successfully')" onerror="console.log('Logo failed to load, hiding'); this.style.display='none'">
             </div>
             <h1>🎓 Student Registration</h1>
             <p>Join our expert tutoring program and excel in mathematics!</p>
@@ -579,6 +579,16 @@
             </a>
 
             <div id="alertContainer"></div>
+            
+            <!-- Debug Test Buttons (remove in production) -->
+            <div id="debugButtons" style="margin: 20px 0; padding: 15px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px;">
+                <h4 style="margin: 0 0 10px 0; color: #6c757d;">🔧 Debug Tools (for testing error display)</h4>
+                <button type="button" onclick="testModal()" style="margin: 5px; padding: 8px 15px; background: #ffc107; border: none; border-radius: 3px; cursor: pointer;">Test Warning Modal</button>
+                <button type="button" onclick="testValidationResponse()" style="margin: 5px; padding: 8px 15px; background: #17a2b8; border: none; border-radius: 3px; cursor: pointer;">Test Validation Response</button>
+                <button type="button" onclick="testInvalidSubmission()" style="margin: 5px; padding: 8px 15px; background: #dc3545; color: white; border: none; border-radius: 3px; cursor: pointer;">Test Invalid Form Submission</button>
+                <button type="button" onclick="debugErrorDivs()" style="margin: 5px; padding: 8px 15px; background: #6c757d; color: white; border: none; border-radius: 3px; cursor: pointer;">Check Error Divs</button>
+                <p style="margin: 10px 0 0 0; font-size: 12px; color: #6c757d;">Use these buttons to test if error messages are displaying correctly.</p>
+            </div>
             
             <!-- Validation Summary -->
             <div id="validationSummary" class="validation-summary">
@@ -1664,18 +1674,97 @@
         function testModal() {
             console.log('🧪 TESTING MODAL DISPLAY...');
             
-            // Test error modal
+            // Test warning modal first
             showModal(
-                'error',
-                'Test Error Modal ⚠️',
-                `<strong>This is a test error modal!</strong><br><br>
-                If you can see this modal, the display system is working correctly.<br><br>
-                Click OK to close this test.`
+                'warning',
+                'Test Validation Warning ⚠️',
+                `<strong>We found some issues that need your attention:</strong><br><br>
+                <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px; padding: 15px; margin: 10px 0;">
+                    <ul style="margin: 0; padding-left: 20px; text-align: left;">
+                        <li style="margin: 5px 0;">First name must be at least 2 characters long</li>
+                        <li style="margin: 5px 0;">Please provide a valid email address</li>
+                        <li style="margin: 5px 0;">Please select at least one subject</li>
+                    </ul>
+                </div>
+                <strong>What to do next:</strong><br>
+                • Review the issues listed above<br>
+                • Make the necessary corrections in the form<br>
+                • Click "Submit Registration" again<br><br>
+                This is a test of the validation error display system.`
             );
         }
         
+        // Test function to simulate server validation response
+        function testValidationResponse() {
+            console.log('🧪 TESTING VALIDATION RESPONSE HANDLING...');
+            
+            const mockErrorData = {
+                success: false,
+                message: 'Please correct the following issues and try again:',
+                errors: [
+                    'First name must be at least 2 characters long',
+                    'Please provide a valid email address',
+                    'Please select at least one subject you need help with'
+                ],
+                type: 'validation'
+            };
+            
+            console.log('📝 Mock error data:', mockErrorData);
+            
+            // Simulate the validation error handling
+            const errorList = mockErrorData.errors || [];
+            const errorListHtml = errorList.map(error => `<li style="margin: 5px 0;">${error}</li>`).join('');
+            
+            console.log('📝 Generated error list HTML:', errorListHtml);
+            
+            showModal(
+                'warning',
+                'Please Check Your Information ⚠️',
+                `<strong>We found some issues that need your attention:</strong><br><br>
+                <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px; padding: 15px; margin: 10px 0;">
+                    <ul style="margin: 0; padding-left: 20px; text-align: left;">
+                        ${errorListHtml}
+                    </ul>
+                </div>
+                <strong>What to do next:</strong><br>
+                • Review the issues listed above<br>
+                • Make the necessary corrections in the form<br>
+                • Click "Submit Registration" again<br><br>
+                <strong>Need help?</strong> Contact us:<br>
+                📧 khan.apcalculus@gmail.com<br>
+                📱 714-400-8283`
+            );
+        }
+        
+        // Test function to submit invalid data
+        function testInvalidSubmission() {
+            console.log('🧪 TESTING INVALID FORM SUBMISSION...');
+            
+            // Fill form with invalid data
+            document.getElementById('firstName').value = '';
+            document.getElementById('lastName').value = '';
+            document.getElementById('email').value = 'invalid-email';
+            document.getElementById('phone').value = '123';
+            document.getElementById('grade').value = '';
+            document.getElementById('country').value = '';
+            document.getElementById('timezone').value = '';
+            
+            // Uncheck all subjects
+            const subjectCheckboxes = document.querySelectorAll('input[name="subjects"]');
+            subjectCheckboxes.forEach(cb => cb.checked = false);
+            
+            console.log('📝 Form filled with invalid data, triggering submission...');
+            
+            // Trigger form submission
+            const form = document.getElementById('registrationForm');
+            const event = new Event('submit', { bubbles: true, cancelable: true });
+            form.dispatchEvent(event);
+        }
+
         // Add to window for console access
         window.testModal = testModal;
+        window.testValidationResponse = testValidationResponse;
+        window.testInvalidSubmission = testInvalidSubmission;
         window.debugErrorDivs = debugErrorDivs;
         window.testValidation = testValidation;
 
@@ -1822,6 +1911,8 @@
                 });
                 
                 console.log('📥 Server response status:', response.status, response.statusText);
+                console.log('📥 Response headers:', response.headers);
+                console.log('📥 Response OK:', response.ok);
                 
                 // Check if response is okay and can be parsed as JSON
                 if (!response.ok) {
@@ -1854,14 +1945,16 @@
                     // Handle validation errors differently than server errors
                     if (errorData && errorData.type === 'validation') {
                         console.log('⚠️ Validation errors found, showing user-friendly guidance');
+                        console.log('📝 Error data details:', errorData);
+                        console.log('📝 Error list:', errorData.errors);
                         
                         const errorList = errorData.errors || [];
-                        const errorListHtml = errorList.map(error => `<li style="margin: 5px 0;">${error}</li>`).join('');
+                        console.log('📝 Processing error list:', errorList);
                         
-                        showModal(
-                            'warning',
-                            'Please Check Your Information ⚠️',
-                            `<strong>We found some issues that need your attention:</strong><br><br>
+                        const errorListHtml = errorList.map(error => `<li style="margin: 5px 0;">${error}</li>`).join('');
+                        console.log('📝 Generated HTML:', errorListHtml);
+                        
+                        const modalContent = `<strong>We found some issues that need your attention:</strong><br><br>
                             <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px; padding: 15px; margin: 10px 0;">
                                 <ul style="margin: 0; padding-left: 20px; text-align: left;">
                                     ${errorListHtml}
@@ -1873,7 +1966,14 @@
                             • Click "Submit Registration" again<br><br>
                             <strong>Need help?</strong> Contact us:<br>
                             📧 khan.apcalculus@gmail.com<br>
-                            📱 714-400-8283`
+                            📱 714-400-8283`;
+                        
+                        console.log('📝 Final modal content:', modalContent);
+                        
+                        showModal(
+                            'warning',
+                            'Please Check Your Information ⚠️',
+                            modalContent
                         );
                     } else {
                         // Show generic server error for non-validation issues
