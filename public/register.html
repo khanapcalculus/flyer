@@ -132,13 +132,18 @@
         .error-message {
             color: #dc3545;
             font-size: 14px;
-            margin-top: 5px;
+            margin-top: 8px;
+            margin-bottom: 10px;
             display: none;
-            font-weight: 500;
+            font-weight: 600;
+            background: #fff5f5;
+            padding: 8px 12px;
+            border-left: 4px solid #dc3545;
+            border-radius: 4px;
         }
 
         .error-message.show {
-            display: block;
+            display: block !important;
             animation: fadeIn 0.3s ease-in;
         }
 
@@ -902,6 +907,11 @@
                 <button type="submit" class="btn btn-primary" id="submitBtn">
                     <i class="fas fa-paper-plane"></i> Submit Registration
                 </button>
+                
+                <!-- Test validation button (remove in production) -->
+                <button type="button" class="btn btn-secondary" onclick="testValidation()" style="margin-top: 10px; width: 100%;">
+                    🧪 Test Error Display (for debugging)
+                </button>
             </form>
         </div>
     </div>
@@ -1112,6 +1122,78 @@
             }
         }
 
+        // Real-time validation functions
+        function validateFieldRealTime(fieldId) {
+            const field = document.getElementById(fieldId);
+            const value = field.value.trim();
+            
+            switch(fieldId) {
+                case 'firstName':
+                    if (!value) {
+                        showFieldError(fieldId, '❌ First name is required. Please enter your first name (e.g., "John").');
+                    } else if (value.length < 2) {
+                        showFieldError(fieldId, '❌ First name must be at least 2 characters long.');
+                    } else {
+                        clearFieldError(fieldId);
+                    }
+                    break;
+                    
+                case 'lastName':
+                    if (!value) {
+                        showFieldError(fieldId, '❌ Last name is required. Please enter your last name (e.g., "Smith").');
+                    } else if (value.length < 2) {
+                        showFieldError(fieldId, '❌ Last name must be at least 2 characters long.');
+                    } else {
+                        clearFieldError(fieldId);
+                    }
+                    break;
+                    
+                case 'email':
+                    if (!value) {
+                        showFieldError(fieldId, '❌ Email address is required. Please enter your email (e.g., "john@example.com").');
+                    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+                        showFieldError(fieldId, '❌ Invalid email format. Please use format: your@email.com (include @ and domain).');
+                    } else {
+                        clearFieldError(fieldId);
+                    }
+                    break;
+                    
+                case 'phone':
+                    if (!value) {
+                        showFieldError(fieldId, '❌ Phone number is required. Enter with country code if international (e.g., "+1-555-123-4567").');
+                    } else if (value.length < 10) {
+                        showFieldError(fieldId, '❌ Phone number too short. Please enter at least 10 digits including country code if needed.');
+                    } else {
+                        clearFieldError(fieldId);
+                    }
+                    break;
+                    
+                case 'grade':
+                    if (!field.value) {
+                        showFieldError(fieldId, '❌ Grade level is required. Please select your current grade from the dropdown menu.');
+                    } else {
+                        clearFieldError(fieldId);
+                    }
+                    break;
+                    
+                case 'country':
+                    if (!field.value) {
+                        showFieldError(fieldId, '❌ Country is required. Please select your country from the dropdown list.');
+                    } else {
+                        clearFieldError(fieldId);
+                    }
+                    break;
+                    
+                case 'timezone':
+                    if (!field.value) {
+                        showFieldError(fieldId, '❌ Time zone is required. First select your country above, then choose your time zone.');
+                    } else {
+                        clearFieldError(fieldId);
+                    }
+                    break;
+            }
+        }
+
         // Enable/disable time inputs based on day checkboxes
         document.addEventListener('DOMContentLoaded', function() {
             const dayCheckboxes = document.querySelectorAll('input[name="scheduleDay"]');
@@ -1122,6 +1204,50 @@
             timezoneSelect.disabled = true;
             timezoneSelect.style.opacity = '0.6';
             
+            // Add real-time validation to form fields
+            const fieldsToValidate = ['firstName', 'lastName', 'email', 'phone', 'grade', 'country', 'timezone'];
+            
+            fieldsToValidate.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    // Validate on blur (when user leaves the field)
+                    field.addEventListener('blur', function() {
+                        if (this.value.trim() !== '') {
+                            validateFieldRealTime(fieldId);
+                        }
+                    });
+                    
+                    // Clear errors on focus (when user starts typing)
+                    field.addEventListener('focus', function() {
+                        const errorDiv = document.getElementById(fieldId + '-error');
+                        if (errorDiv && errorDiv.classList.contains('show')) {
+                            // Don't clear completely, just reduce visibility to show they're working on it
+                            this.classList.remove('error');
+                        }
+                    });
+                    
+                    // For dropdowns, validate immediately on change
+                    if (field.tagName === 'SELECT') {
+                        field.addEventListener('change', function() {
+                            validateFieldRealTime(fieldId);
+                        });
+                    }
+                }
+            });
+            
+            // Validate subjects when checkboxes change
+            const subjectCheckboxes = document.querySelectorAll('input[name="subjects"]');
+            subjectCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const checkedSubjects = document.querySelectorAll('input[name="subjects"]:checked');
+                    if (checkedSubjects.length === 0) {
+                        showFieldError('subjects', '❌ At least one subject is required. Please check the boxes for subjects you need help with.');
+                    } else {
+                        clearFieldError('subjects');
+                    }
+                });
+            });
+            
             // Handle country selection change
             countrySelect.addEventListener('change', function() {
                 const selectedCountry = this.value;
@@ -1129,6 +1255,7 @@
                 
                 if (selectedCountry) {
                     updateTimezoneOptions(selectedCountry);
+                    clearFieldError('country');
                 } else {
                     timezoneSelect.disabled = true;
                     timezoneSelect.style.opacity = '0.6';
@@ -1160,12 +1287,20 @@
             const field = document.getElementById(fieldId);
             const errorDiv = document.getElementById(fieldId + '-error');
             
-            field.classList.add('error');
-            field.classList.remove('success');
+            console.log('Showing error for field:', fieldId, 'Message:', message);
+            
+            if (field) {
+                field.classList.add('error');
+                field.classList.remove('success');
+            }
             
             if (errorDiv) {
                 errorDiv.textContent = message;
                 errorDiv.classList.add('show');
+                errorDiv.style.display = 'block';
+                console.log('Error div updated for:', fieldId, 'Visible:', errorDiv.offsetHeight > 0);
+            } else {
+                console.log('Error div not found for field:', fieldId);
             }
         }
 
@@ -1203,63 +1338,84 @@
             clearAllErrors();
             
             const errors = [];
+            let firstErrorField = null;
             
-            // Validate required fields
+            // Validate required fields with detailed error messages
             const firstName = document.getElementById('firstName').value.trim();
             if (!firstName) {
-                showFieldError('firstName', 'Please enter your first name');
-                errors.push('First name is required');
+                showFieldError('firstName', '❌ First name is required. Please enter your first name (e.g., "John").');
+                errors.push('Enter your first name');
+                if (!firstErrorField) firstErrorField = 'firstName';
+            } else if (firstName.length < 2) {
+                showFieldError('firstName', '❌ First name must be at least 2 characters long.');
+                errors.push('First name too short');
+                if (!firstErrorField) firstErrorField = 'firstName';
             } else {
                 clearFieldError('firstName');
             }
 
             const lastName = document.getElementById('lastName').value.trim();
             if (!lastName) {
-                showFieldError('lastName', 'Please enter your last name');
-                errors.push('Last name is required');
+                showFieldError('lastName', '❌ Last name is required. Please enter your last name (e.g., "Smith").');
+                errors.push('Enter your last name');
+                if (!firstErrorField) firstErrorField = 'lastName';
+            } else if (lastName.length < 2) {
+                showFieldError('lastName', '❌ Last name must be at least 2 characters long.');
+                errors.push('Last name too short');
+                if (!firstErrorField) firstErrorField = 'lastName';
             } else {
                 clearFieldError('lastName');
             }
 
             const email = document.getElementById('email').value.trim();
             if (!email) {
-                showFieldError('email', 'Please enter your email address');
-                errors.push('Email address is required');
+                showFieldError('email', '❌ Email address is required. Please enter your email (e.g., "john@example.com").');
+                errors.push('Enter your email address');
+                if (!firstErrorField) firstErrorField = 'email';
             } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                showFieldError('email', 'Please enter a valid email address');
-                errors.push('Please enter a valid email address');
+                showFieldError('email', '❌ Invalid email format. Please use format: your@email.com (include @ and domain).');
+                errors.push('Fix email format (need @ and .com)');
+                if (!firstErrorField) firstErrorField = 'email';
             } else {
                 clearFieldError('email');
             }
 
             const phone = document.getElementById('phone').value.trim();
             if (!phone) {
-                showFieldError('phone', 'Please enter your phone number');
-                errors.push('Phone number is required');
+                showFieldError('phone', '❌ Phone number is required. Enter with country code if international (e.g., "+1-555-123-4567" or "555-123-4567").');
+                errors.push('Enter your phone number');
+                if (!firstErrorField) firstErrorField = 'phone';
+            } else if (phone.length < 10) {
+                showFieldError('phone', '❌ Phone number too short. Please enter at least 10 digits including country code if needed.');
+                errors.push('Phone number too short');
+                if (!firstErrorField) firstErrorField = 'phone';
             } else {
                 clearFieldError('phone');
             }
 
             const grade = document.getElementById('grade').value;
             if (!grade) {
-                showFieldError('grade', 'Please select your grade level');
-                errors.push('Grade level is required');
+                showFieldError('grade', '❌ Grade level is required. Please select your current grade from the dropdown menu.');
+                errors.push('Select your grade level');
+                if (!firstErrorField) firstErrorField = 'grade';
             } else {
                 clearFieldError('grade');
             }
 
             const country = document.getElementById('country').value;
             if (!country) {
-                showFieldError('country', 'Please select your country');
-                errors.push('Country is required');
+                showFieldError('country', '❌ Country is required. Please select your country from the dropdown list.');
+                errors.push('Select your country');
+                if (!firstErrorField) firstErrorField = 'country';
             } else {
                 clearFieldError('country');
             }
 
             const timezone = document.getElementById('timezone').value;
             if (!timezone) {
-                showFieldError('timezone', 'Please select your time zone');
-                errors.push('Time zone is required');
+                showFieldError('timezone', '❌ Time zone is required. First select your country above, then choose your time zone.');
+                errors.push('Select your time zone');
+                if (!firstErrorField) firstErrorField = 'timezone';
             } else {
                 clearFieldError('timezone');
             }
@@ -1267,8 +1423,9 @@
             // Validate subjects
             const subjectCheckboxes = document.querySelectorAll('input[name="subjects"]:checked');
             if (subjectCheckboxes.length === 0) {
-                showFieldError('subjects', 'Please select at least one subject');
-                errors.push('At least one subject must be selected');
+                showFieldError('subjects', '❌ At least one subject is required. Please check the boxes for subjects you need help with (e.g., Algebra, Calculus, etc.).');
+                errors.push('Select at least one subject you need help with');
+                if (!firstErrorField) firstErrorField = 'subjects';
             } else {
                 clearFieldError('subjects');
             }
@@ -1288,10 +1445,35 @@
                 validationSummary.classList.add('show');
                 validationSummary.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 
+                // Focus on first error field
+                if (firstErrorField) {
+                    setTimeout(() => {
+                        document.getElementById(firstErrorField).focus();
+                    }, 300);
+                }
+                
                 return false;
             }
 
             return true;
+        }
+
+        // Test function to check if error display is working
+        function testValidation() {
+            console.log('Testing validation display...');
+            showFieldError('firstName', '❌ TEST: This is a test error message for first name');
+            showFieldError('email', '❌ TEST: This is a test error message for email');
+            showFieldError('subjects', '❌ TEST: This is a test error message for subjects');
+            
+            // Test validation summary
+            const validationSummary = document.getElementById('validationSummary');
+            const validationList = document.getElementById('validationList');
+            
+            validationList.innerHTML = '<li>Test error 1</li><li>Test error 2</li><li>Test error 3</li>';
+            validationSummary.classList.add('show');
+            validationSummary.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            console.log('Test validation triggered. Check if errors are visible.');
         }
 
         document.getElementById('registrationForm').addEventListener('submit', async function(e) {
@@ -1300,10 +1482,15 @@
             const submitBtn = document.getElementById('submitBtn');
             const loadingIndicator = document.getElementById('loadingIndicator');
             
+            console.log('Form submitted, running validation...');
+            
             // Validate form first
             if (!validateForm()) {
+                console.log('Validation failed, form submission stopped');
                 return; // Stop here if validation fails
             }
+            
+            console.log('Validation passed, proceeding with submission...');
             
             // Show loading
             submitBtn.disabled = true;
