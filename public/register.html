@@ -944,54 +944,105 @@
     <script>
         // Modal functions
         function showModal(type, title, message, callback = null) {
-            const modal = document.getElementById('responseModal');
-            const modalHeader = document.getElementById('modalHeader');
-            const modalIcon = document.getElementById('modalIcon');
-            const modalTitle = document.getElementById('modalTitle');
-            const modalMessage = document.getElementById('modalMessage');
-            const modalBtn = document.getElementById('modalBtn');
+            console.log('🔧 showModal called with:', { type, title, message: message.substring(0, 50) + '...' });
             
-            // Reset classes
-            modalHeader.className = 'modal-header';
-            modalBtn.className = 'modal-btn';
-            
-            if (type === 'success') {
-                modalHeader.classList.add('success');
-                modalIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
-                modalTitle.textContent = title;
-                modalMessage.innerHTML = message;
-            } else if (type === 'error') {
-                modalHeader.classList.add('error');
-                modalBtn.classList.add('error');
-                modalIcon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
-                modalTitle.textContent = title;
-                modalMessage.innerHTML = message;
+            try {
+                const modal = document.getElementById('responseModal');
+                const modalHeader = document.getElementById('modalHeader');
+                const modalIcon = document.getElementById('modalIcon');
+                const modalTitle = document.getElementById('modalTitle');
+                const modalMessage = document.getElementById('modalMessage');
+                const modalBtn = document.getElementById('modalBtn');
+                
+                console.log('🔍 Modal elements found:', {
+                    modal: !!modal,
+                    modalHeader: !!modalHeader,
+                    modalIcon: !!modalIcon,
+                    modalTitle: !!modalTitle,
+                    modalMessage: !!modalMessage,
+                    modalBtn: !!modalBtn
+                });
+                
+                if (!modal) {
+                    console.error('❌ Modal element not found!');
+                    alert('Error: Modal not found. Please refresh the page and try again.');
+                    return;
+                }
+                
+                // Reset classes
+                if (modalHeader) {
+                    modalHeader.className = 'modal-header';
+                }
+                if (modalBtn) {
+                    modalBtn.className = 'modal-btn';
+                }
+                
+                if (type === 'success') {
+                    console.log('✅ Setting up success modal');
+                    if (modalHeader) modalHeader.classList.add('success');
+                    if (modalIcon) modalIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
+                    if (modalTitle) modalTitle.textContent = title;
+                    if (modalMessage) modalMessage.innerHTML = message;
+                } else if (type === 'error') {
+                    console.log('❌ Setting up error modal');
+                    if (modalHeader) modalHeader.classList.add('error');
+                    if (modalBtn) modalBtn.classList.add('error');
+                    if (modalIcon) modalIcon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+                    if (modalTitle) modalTitle.textContent = title;
+                    if (modalMessage) modalMessage.innerHTML = message;
+                }
+                
+                // Force display with multiple methods
+                modal.style.display = 'block';
+                modal.style.visibility = 'visible';
+                modal.style.opacity = '1';
+                modal.style.zIndex = '9999';
+                
+                console.log('👁️ Modal display set to:', {
+                    display: modal.style.display,
+                    visibility: modal.style.visibility,
+                    opacity: modal.style.opacity,
+                    zIndex: modal.style.zIndex,
+                    offsetHeight: modal.offsetHeight,
+                    offsetWidth: modal.offsetWidth
+                });
+                
+                // Handle modal close
+                const handleClose = () => {
+                    console.log('🔄 Closing modal');
+                    modal.style.display = 'none';
+                    if (callback) callback();
+                };
+                
+                if (modalBtn) {
+                    modalBtn.onclick = handleClose;
+                }
+                
+                const closeBtn = modal.querySelector('.close');
+                if (closeBtn) {
+                    closeBtn.onclick = handleClose;
+                }
+                
+                // Close on outside click
+                window.onclick = function(event) {
+                    if (event.target === modal) {
+                        handleClose();
+                    }
+                };
+                
+                // Close on escape key
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape' && modal.style.display === 'block') {
+                        handleClose();
+                    }
+                });
+                
+                console.log('✅ Modal setup complete');
+                
+            } catch (error) {
+                console.error('💥 Error in showModal:', error);
+                alert(`Error displaying modal: ${error.message}\n\nOriginal message: ${title}\n${message.replace(/<[^>]*>/g, '')}`);
             }
-            
-            modal.style.display = 'block';
-            
-            // Handle modal close
-            const handleClose = () => {
-                modal.style.display = 'none';
-                if (callback) callback();
-            };
-            
-            modalBtn.onclick = handleClose;
-            document.querySelector('.close').onclick = handleClose;
-            
-            // Close on outside click
-            window.onclick = function(event) {
-                if (event.target === modal) {
-                    handleClose();
-                }
-            };
-            
-            // Close on escape key
-            document.addEventListener('keydown', function(event) {
-                if (event.key === 'Escape' && modal.style.display === 'block') {
-                    handleClose();
-                }
-            });
         }
 
         // Country to timezone mapping
@@ -1587,6 +1638,25 @@
             });
         }
 
+        // Debug function to test modal display
+        function testModal() {
+            console.log('🧪 TESTING MODAL DISPLAY...');
+            
+            // Test error modal
+            showModal(
+                'error',
+                'Test Error Modal ⚠️',
+                `<strong>This is a test error modal!</strong><br><br>
+                If you can see this modal, the display system is working correctly.<br><br>
+                Click OK to close this test.`
+            );
+        }
+        
+        // Add to window for console access
+        window.testModal = testModal;
+        window.debugErrorDivs = debugErrorDivs;
+        window.testValidation = testValidation;
+
         // Test function to check if error display is working
         function testValidation() {
             console.log('🧪 TESTING VALIDATION DISPLAY...');
@@ -1719,6 +1789,8 @@
                     experience: formData.get('experience')
                 };
                 
+                console.log('📤 Sending registration data:', registrationData);
+                
                 const response = await fetch('/api/register', {
                     method: 'POST',
                     headers: {
@@ -1727,9 +1799,46 @@
                     body: JSON.stringify(registrationData)
                 });
                 
+                console.log('📥 Server response status:', response.status, response.statusText);
+                
+                // Check if response is okay and can be parsed as JSON
+                if (!response.ok) {
+                    console.log('❌ Server returned error status:', response.status);
+                    let errorMessage = 'Registration failed. Please try again.';
+                    
+                    try {
+                        const errorData = await response.json();
+                        console.log('📄 Error response data:', errorData);
+                        errorMessage = errorData.message || errorMessage;
+                    } catch (parseError) {
+                        console.log('⚠️ Could not parse error response as JSON:', parseError);
+                        errorMessage = `Server error (${response.status}): ${response.statusText}`;
+                    }
+                    
+                    // Show specific server error
+                    console.log('🚨 Displaying error modal with message:', errorMessage);
+                    showModal(
+                        'error',
+                        'Registration Failed ❌',
+                        `<strong>Sorry, registration could not be completed:</strong><br><br>
+                        <div style="background: #ffebee; border: 1px solid #f44336; border-radius: 5px; padding: 15px; margin: 10px 0;">
+                            <strong>Error:</strong> ${errorMessage}
+                        </div>
+                        <strong>What you can do:</strong><br>
+                        • Check the information you entered<br>
+                        • Try again in a few moments<br>
+                        • Contact us directly if the problem persists<br><br>
+                        📧 khan.apcalculus@gmail.com<br>
+                        📱 714-400-8283`
+                    );
+                    return; // Exit early for server errors
+                }
+                
                 const result = await response.json();
+                console.log('📄 Server response data:', result);
                 
                 if (result.success) {
+                    console.log('✅ Registration successful!');
                     // Show success modal
                     showModal(
                         'success',
@@ -1752,25 +1861,49 @@
                         }
                     );
                 } else {
-                    throw new Error(result.message || 'Registration failed');
+                    console.log('⚠️ Server returned success=false:', result.message);
+                    // Handle server validation errors (like duplicate email)
+                    const errorMessage = result.message || 'Registration failed due to validation error';
+                    
+                    console.log('🚨 Displaying validation error modal with message:', errorMessage);
+                    showModal(
+                        'error',
+                        'Registration Error ⚠️',
+                        `<strong>Unable to complete registration:</strong><br><br>
+                        <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 5px; padding: 15px; margin: 10px 0;">
+                            <strong>Issue:</strong> ${errorMessage}
+                        </div>
+                        <strong>How to fix this:</strong><br>
+                        • If the email is already registered, try using a different email<br>
+                        • Check that all required fields are filled correctly<br>
+                        • Contact us if you need assistance<br><br>
+                        📧 khan.apcalculus@gmail.com<br>
+                        📱 714-400-8283`
+                    );
                 }
                 
             } catch (error) {
-                console.error('Registration error:', error);
+                console.error('💥 Unexpected registration error:', error);
                 
-                // Show error modal
+                // This should only catch network errors or unexpected failures
                 showModal(
                     'error',
-                    'Registration Failed ❌',
-                    `<strong>Oops! Something went wrong:</strong><br><br>
-                    ${error.message}<br><br>
-                    Please try again or contact us directly:<br>
+                    'Connection Error ❌',
+                    `<strong>Unable to connect to server:</strong><br><br>
+                    <div style="background: #ffebee; border: 1px solid #f44336; border-radius: 5px; padding: 15px; margin: 10px 0;">
+                        <strong>Error:</strong> ${error.message}
+                    </div>
+                    <strong>Please try:</strong><br>
+                    • Check your internet connection<br>
+                    • Refresh the page and try again<br>
+                    • Contact us if the problem continues<br><br>
                     📧 khan.apcalculus@gmail.com<br>
                     📱 714-400-8283`
                 );
             } finally {
                 submitBtn.disabled = false;
                 loadingIndicator.style.display = 'none';
+                console.log('🔄 Form submission complete, buttons re-enabled');
             }
         });
     </script>
