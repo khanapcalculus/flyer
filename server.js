@@ -356,35 +356,37 @@ app.post('/api/register', async (req, res) => {
       goals, experience
     } = req.body;
 
-    // Validation - collect all errors instead of stopping at first one
+    // Focused validation - only validate critical fields: email and phone
     const validationErrors = [];
     
-    if (!firstName || firstName.trim().length < 2) {
-      validationErrors.push('First name must be at least 2 characters long');
-    }
-    
-    if (!lastName || lastName.trim().length < 2) {
-      validationErrors.push('Last name must be at least 2 characters long');
-    }
-    
+    // Email validation - most critical
     if (!email || !validator.isEmail(email)) {
-      validationErrors.push('Please provide a valid email address');
+      validationErrors.push('Please provide a valid email address (e.g., john@example.com)');
     }
     
-    if (!phone || phone.replace(/[-()\s]/g, '').length < 10) {
-      validationErrors.push('Please provide a valid phone number with at least 10 digits');
+    // Phone validation - digits only, at least 10 digits
+    if (!phone) {
+      validationErrors.push('Please provide a phone number');
+    } else {
+      const phoneDigits = phone.replace(/\D/g, ''); // Remove all non-digits
+      if (phoneDigits.length < 10) {
+        validationErrors.push('Phone number must have at least 10 digits');
+      } else if (phoneDigits.length > 15) {
+        validationErrors.push('Phone number cannot exceed 15 digits');
+      }
+    }
+    
+    // Basic required field checks (but less strict)
+    if (!firstName || firstName.trim().length === 0) {
+      validationErrors.push('First name is required');
+    }
+    
+    if (!lastName || lastName.trim().length === 0) {
+      validationErrors.push('Last name is required');
     }
     
     if (!grade) {
       validationErrors.push('Please select your grade level');
-    }
-    
-    if (!country) {
-      validationErrors.push('Please select your country');
-    }
-    
-    if (!timezone) {
-      validationErrors.push('Please select your time zone');
     }
     
     if (!subjects || subjects.length === 0) {

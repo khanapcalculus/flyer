@@ -585,9 +585,10 @@
                 <h4 style="margin: 0 0 10px 0; color: #6c757d;">🔧 Debug Tools (for testing error display)</h4>
                 <button type="button" onclick="testModal()" style="margin: 5px; padding: 8px 15px; background: #ffc107; border: none; border-radius: 3px; cursor: pointer;">Test Warning Modal</button>
                 <button type="button" onclick="testValidationResponse()" style="margin: 5px; padding: 8px 15px; background: #17a2b8; border: none; border-radius: 3px; cursor: pointer;">Test Validation Response</button>
-                <button type="button" onclick="testInvalidSubmission()" style="margin: 5px; padding: 8px 15px; background: #dc3545; color: white; border: none; border-radius: 3px; cursor: pointer;">Test Invalid Form Submission</button>
+                <button type="button" onclick="testEmailPhoneErrors()" style="margin: 5px; padding: 8px 15px; background: #28a745; color: white; border: none; border-radius: 3px; cursor: pointer;">📧📱 Test Email/Phone Errors</button>
+                <button type="button" onclick="testInvalidSubmission()" style="margin: 5px; padding: 8px 15px; background: #dc3545; color: white; border: none; border-radius: 3px; cursor: pointer;">Test All Form Errors</button>
                 <button type="button" onclick="debugErrorDivs()" style="margin: 5px; padding: 8px 15px; background: #6c757d; color: white; border: none; border-radius: 3px; cursor: pointer;">Check Error Divs</button>
-                <p style="margin: 10px 0 0 0; font-size: 12px; color: #6c757d;">Use these buttons to test if error messages are displaying correctly.</p>
+                <p style="margin: 10px 0 0 0; font-size: 12px; color: #6c757d;">📧📱 <strong>New:</strong> Focus on Email/Phone validation only. Use "Test Email/Phone Errors" to test the streamlined validation.</p>
             </div>
             
             <!-- Validation Summary -->
@@ -646,8 +647,15 @@
                         </div>
                         <div class="form-group">
                             <label for="phone">Phone Number <span class="required">*</span></label>
-                            <input type="tel" id="phone" name="phone" class="form-control" placeholder="e.g., +1-714-400-8283 or 714-400-8283" required>
+                            <input type="tel" id="phone" name="phone" class="form-control" placeholder="e.g., 7144008283 or +17144008283" required 
+                                   maxlength="20" 
+                                   onkeypress="return isDigitOrPlus(event)"
+                                   oninput="formatPhoneNumber(this)"
+                                   onpaste="handlePhonePaste(event)">
                             <div class="error-message" id="phone-error"></div>
+                            <div class="field-helper" style="font-size: 12px; color: #666; margin-top: 5px;">
+                                📱 Enter digits only. Include country code if international (e.g., +1 for US/Canada)
+                            </div>
                         </div>
                     </div>
 
@@ -1537,33 +1545,9 @@
             const errors = [];
             let firstErrorField = null;
             
-            // Validate required fields with detailed error messages
-            const firstName = document.getElementById('firstName').value.trim();
-            if (!firstName) {
-                showFieldError('firstName', '❌ First name is required. Please enter your first name (e.g., "John").');
-                errors.push('Enter your first name');
-                if (!firstErrorField) firstErrorField = 'firstName';
-            } else if (firstName.length < 2) {
-                showFieldError('firstName', '❌ First name must be at least 2 characters long.');
-                errors.push('First name too short');
-                if (!firstErrorField) firstErrorField = 'firstName';
-            } else {
-                clearFieldError('firstName');
-            }
-
-            const lastName = document.getElementById('lastName').value.trim();
-            if (!lastName) {
-                showFieldError('lastName', '❌ Last name is required. Please enter your last name (e.g., "Smith").');
-                errors.push('Enter your last name');
-                if (!firstErrorField) firstErrorField = 'lastName';
-            } else if (lastName.length < 2) {
-                showFieldError('lastName', '❌ Last name must be at least 2 characters long.');
-                errors.push('Last name too short');
-                if (!firstErrorField) firstErrorField = 'lastName';
-            } else {
-                clearFieldError('lastName');
-            }
-
+            // Focus on critical fields: email and phone number
+            
+            // Email validation (most critical)
             const email = document.getElementById('email').value.trim();
             if (!email) {
                 showFieldError('email', '❌ Email address is required. Please enter your email (e.g., "john@example.com").');
@@ -1577,44 +1561,53 @@
                 clearFieldError('email');
             }
 
+            // Phone number validation (digits only, 10-15 digits)
             const phone = document.getElementById('phone').value.trim();
             if (!phone) {
-                showFieldError('phone', '❌ Phone number is required. Enter with country code if international (e.g., "+1-555-123-4567" or "555-123-4567").');
+                showFieldError('phone', '❌ Phone number is required. Enter digits only (e.g., "7144008283" or "+17144008283").');
                 errors.push('Enter your phone number');
                 if (!firstErrorField) firstErrorField = 'phone';
-            } else if (phone.length < 10) {
-                showFieldError('phone', '❌ Phone number too short. Please enter at least 10 digits including country code if needed.');
-                errors.push('Phone number too short');
-                if (!firstErrorField) firstErrorField = 'phone';
             } else {
-                clearFieldError('phone');
+                const phoneDigits = phone.replace(/\D/g, ''); // Remove all non-digits
+                if (phoneDigits.length < 10) {
+                    showFieldError('phone', `❌ Phone number too short. You entered ${phoneDigits.length} digits, need at least 10.`);
+                    errors.push('Phone number needs at least 10 digits');
+                    if (!firstErrorField) firstErrorField = 'phone';
+                } else if (phoneDigits.length > 15) {
+                    showFieldError('phone', `❌ Phone number too long. You entered ${phoneDigits.length} digits, maximum is 15.`);
+                    errors.push('Phone number too long (max 15 digits)');
+                    if (!firstErrorField) firstErrorField = 'phone';
+                } else {
+                    clearFieldError('phone');
+                }
+            }
+
+            // Basic required fields (less strict)
+            const firstName = document.getElementById('firstName').value.trim();
+            if (!firstName) {
+                showFieldError('firstName', '❌ First name is required. Please enter your first name.');
+                errors.push('Enter your first name');
+                if (!firstErrorField) firstErrorField = 'firstName';
+            } else {
+                clearFieldError('firstName');
+            }
+
+            const lastName = document.getElementById('lastName').value.trim();
+            if (!lastName) {
+                showFieldError('lastName', '❌ Last name is required. Please enter your last name.');
+                errors.push('Enter your last name');
+                if (!firstErrorField) firstErrorField = 'lastName';
+            } else {
+                clearFieldError('lastName');
             }
 
             const grade = document.getElementById('grade').value;
             if (!grade) {
-                showFieldError('grade', '❌ Grade level is required. Please select your current grade from the dropdown menu.');
+                showFieldError('grade', 'ℹ️ Please select your grade level to help us customize your tutoring.');
                 errors.push('Select your grade level');
                 if (!firstErrorField) firstErrorField = 'grade';
             } else {
                 clearFieldError('grade');
-            }
-
-            const country = document.getElementById('country').value;
-            if (!country) {
-                showFieldError('country', '❌ Country is required. Please select your country from the dropdown list.');
-                errors.push('Select your country');
-                if (!firstErrorField) firstErrorField = 'country';
-            } else {
-                clearFieldError('country');
-            }
-
-            const timezone = document.getElementById('timezone').value;
-            if (!timezone) {
-                showFieldError('timezone', '❌ Time zone is required. First select your country above, then choose your time zone.');
-                errors.push('Select your time zone');
-                if (!firstErrorField) firstErrorField = 'timezone';
-            } else {
-                clearFieldError('timezone');
             }
 
             // Validate subjects
@@ -1740,20 +1733,43 @@
         function testInvalidSubmission() {
             console.log('🧪 TESTING INVALID FORM SUBMISSION...');
             
-            // Fill form with invalid data
+            // Fill form with invalid data focusing on email and phone
             document.getElementById('firstName').value = '';
             document.getElementById('lastName').value = '';
-            document.getElementById('email').value = 'invalid-email';
-            document.getElementById('phone').value = '123';
+            document.getElementById('email').value = 'invalid-email';  // Invalid email format
+            document.getElementById('phone').value = '123abc';        // Invalid phone (will be cleaned but too short)
             document.getElementById('grade').value = '';
-            document.getElementById('country').value = '';
-            document.getElementById('timezone').value = '';
             
             // Uncheck all subjects
             const subjectCheckboxes = document.querySelectorAll('input[name="subjects"]');
             subjectCheckboxes.forEach(cb => cb.checked = false);
             
-            console.log('📝 Form filled with invalid data, triggering submission...');
+            console.log('📝 Form filled with invalid data (focusing on email/phone), triggering submission...');
+            
+            // Trigger form submission
+            const form = document.getElementById('registrationForm');
+            const event = new Event('submit', { bubbles: true, cancelable: true });
+            form.dispatchEvent(event);
+        }
+        
+        // Test function to fill form with only email/phone errors
+        function testEmailPhoneErrors() {
+            console.log('🧪 TESTING EMAIL AND PHONE VALIDATION...');
+            
+            // Fill basic required fields correctly
+            document.getElementById('firstName').value = 'John';
+            document.getElementById('lastName').value = 'Doe';
+            document.getElementById('grade').value = '10th';
+            
+            // Check at least one subject
+            const firstSubject = document.querySelector('input[name="subjects"]');
+            if (firstSubject) firstSubject.checked = true;
+            
+            // Add invalid email and phone
+            document.getElementById('email').value = 'invalid@';        // Invalid email
+            document.getElementById('phone').value = '123';            // Too short phone
+            
+            console.log('📝 Testing focused email/phone validation...');
             
             // Trigger form submission
             const form = document.getElementById('registrationForm');
@@ -1761,10 +1777,90 @@
             form.dispatchEvent(event);
         }
 
+        // Phone number formatting functions
+        function isDigitOrPlus(event) {
+            const char = String.fromCharCode(event.which);
+            const input = event.target;
+            
+            // Allow plus only at the beginning
+            if (char === '+' && input.value.length === 0) {
+                return true;
+            }
+            
+            // Allow digits 0-9
+            if (/[0-9]/.test(char)) {
+                return true;
+            }
+            
+            // Allow backspace, delete, tab, escape, enter
+            if ([8, 9, 27, 13, 46].indexOf(event.keyCode) !== -1 ||
+                // Allow Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+                (event.keyCode === 65 && event.ctrlKey === true) ||
+                (event.keyCode === 67 && event.ctrlKey === true) ||
+                (event.keyCode === 86 && event.ctrlKey === true) ||
+                (event.keyCode === 88 && event.ctrlKey === true)) {
+                return true;
+            }
+            
+            // Prevent all other characters
+            event.preventDefault();
+            return false;
+        }
+        
+        function formatPhoneNumber(input) {
+            // Remove all non-digit characters except +
+            let value = input.value.replace(/[^\d+]/g, '');
+            
+            // Ensure + only appears at the beginning
+            if (value.indexOf('+') > 0) {
+                value = value.replace(/\+/g, '');
+            }
+            
+            // Limit length
+            if (value.length > 20) {
+                value = value.substring(0, 20);
+            }
+            
+            input.value = value;
+            
+            // Update visual feedback
+            const phoneDigits = value.replace(/\D/g, '');
+            const phoneError = document.getElementById('phone-error');
+            
+            if (phoneDigits.length > 0 && phoneDigits.length < 10) {
+                input.style.borderColor = '#ffc107'; // Warning color
+                if (phoneError) {
+                    phoneError.textContent = `${phoneDigits.length}/10 digits minimum`;
+                    phoneError.style.color = '#856404';
+                    phoneError.style.display = 'block';
+                }
+            } else if (phoneDigits.length >= 10) {
+                input.style.borderColor = '#28a745'; // Success color
+                if (phoneError) {
+                    phoneError.textContent = '';
+                    phoneError.style.display = 'none';
+                }
+            } else {
+                input.style.borderColor = '';
+                if (phoneError) {
+                    phoneError.textContent = '';
+                    phoneError.style.display = 'none';
+                }
+            }
+        }
+        
+        function handlePhonePaste(event) {
+            // Allow paste but clean it up
+            setTimeout(() => {
+                formatPhoneNumber(event.target);
+            }, 0);
+        }
+
         // Add to window for console access
         window.testModal = testModal;
         window.testValidationResponse = testValidationResponse;
         window.testInvalidSubmission = testInvalidSubmission;
+        window.testEmailPhoneErrors = testEmailPhoneErrors;
         window.debugErrorDivs = debugErrorDivs;
         window.testValidation = testValidation;
 
