@@ -813,7 +813,9 @@
                                 <label for="apenglit">AP English Literature</label>
                             </div>
                         </div>
-                        <div class="error-message" id="subjects-error"></div>
+                        <div class="error-message" id="subjects-error" style="margin-top: 15px;">
+                            <!-- Subjects error messages will appear here -->
+                        </div>
                     </div>
                 </div>
 
@@ -1217,8 +1219,51 @@
             }
         }
 
+        // Ensure all error divs exist
+        function ensureErrorDivsExist() {
+            const fieldIds = ['firstName', 'lastName', 'email', 'phone', 'grade', 'country', 'timezone', 'subjects'];
+            
+            fieldIds.forEach(fieldId => {
+                const errorDivId = fieldId + '-error';
+                let errorDiv = document.getElementById(errorDivId);
+                
+                if (!errorDiv) {
+                    console.log(`Creating missing error div for: ${fieldId}`);
+                    const field = document.getElementById(fieldId);
+                    
+                    if (field && field.parentNode) {
+                        errorDiv = document.createElement('div');
+                        errorDiv.id = errorDivId;
+                        errorDiv.className = 'error-message';
+                        errorDiv.style.display = 'none';
+                        field.parentNode.insertBefore(errorDiv, field.nextSibling);
+                        console.log(`✅ Created error div: ${errorDivId}`);
+                    } else if (fieldId === 'subjects') {
+                        // For subjects, find the checkbox group container
+                        const subjectsContainer = document.querySelector('.checkbox-group');
+                        if (subjectsContainer && subjectsContainer.parentNode) {
+                            errorDiv = document.createElement('div');
+                            errorDiv.id = errorDivId;
+                            errorDiv.className = 'error-message';
+                            errorDiv.style.display = 'none';
+                            errorDiv.style.marginTop = '15px';
+                            subjectsContainer.parentNode.insertBefore(errorDiv, subjectsContainer.nextSibling);
+                            console.log(`✅ Created subjects error div: ${errorDivId}`);
+                        }
+                    }
+                } else {
+                    console.log(`✅ Error div exists: ${errorDivId}`);
+                }
+            });
+        }
+
         // Enable/disable time inputs based on day checkboxes
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 DOM Content Loaded - Initializing form...');
+            
+            // Ensure all error divs exist first
+            ensureErrorDivsExist();
+            
             const dayCheckboxes = document.querySelectorAll('input[name="scheduleDay"]');
             const countrySelect = document.getElementById('country');
             const timezoneSelect = document.getElementById('timezone');
@@ -1260,13 +1305,26 @@
             
             // Validate subjects when checkboxes change
             const subjectCheckboxes = document.querySelectorAll('input[name="subjects"]');
+            console.log('Found subject checkboxes:', subjectCheckboxes.length);
+            
             subjectCheckboxes.forEach(checkbox => {
                 checkbox.addEventListener('change', function() {
+                    console.log('Subject checkbox changed:', this.value, 'Checked:', this.checked);
+                    
                     const checkedSubjects = document.querySelectorAll('input[name="subjects"]:checked');
+                    console.log('Total checked subjects:', checkedSubjects.length);
+                    
                     if (checkedSubjects.length === 0) {
                         showFieldError('subjects', '❌ At least one subject is required. Please check the boxes for subjects you need help with.');
                     } else {
-                        clearFieldError('subjects');
+                        // Clear subjects error
+                        const subjectsErrorDiv = document.getElementById('subjects-error');
+                        if (subjectsErrorDiv) {
+                            subjectsErrorDiv.classList.remove('show');
+                            subjectsErrorDiv.style.display = 'none';
+                            subjectsErrorDiv.textContent = '';
+                            console.log('Subjects error cleared');
+                        }
                     }
                 });
             });
@@ -1353,12 +1411,23 @@
             const field = document.getElementById(fieldId);
             const errorDiv = document.getElementById(fieldId + '-error');
             
-            field.classList.remove('error');
-            field.classList.add('success');
+            console.log('Clearing error for field:', fieldId, 'Field found:', !!field, 'Error div found:', !!errorDiv);
+            
+            if (field) {
+                field.classList.remove('error');
+                field.classList.add('success');
+                field.style.borderColor = '';
+                field.style.backgroundColor = '';
+            } else {
+                console.log('Warning: Field not found for clearFieldError:', fieldId);
+            }
             
             if (errorDiv) {
                 errorDiv.classList.remove('show');
+                errorDiv.style.display = 'none';
                 errorDiv.textContent = '';
+            } else {
+                console.log('Warning: Error div not found for clearFieldError:', fieldId);
             }
         }
 
@@ -1503,9 +1572,27 @@
             return true;
         }
 
+        // Debug function to check all error divs
+        function debugErrorDivs() {
+            const errorDivIds = ['firstName-error', 'lastName-error', 'email-error', 'phone-error', 'grade-error', 'country-error', 'timezone-error', 'subjects-error'];
+            
+            console.log('🔍 CHECKING ERROR DIVS...');
+            errorDivIds.forEach(id => {
+                const div = document.getElementById(id);
+                console.log(`${id}:`, div ? '✅ Found' : '❌ Missing');
+                if (div) {
+                    console.log(`  - Display: ${div.style.display || 'default'}`);
+                    console.log(`  - Classes: ${div.className}`);
+                }
+            });
+        }
+
         // Test function to check if error display is working
         function testValidation() {
             console.log('🧪 TESTING VALIDATION DISPLAY...');
+            
+            // First check if all error divs exist
+            debugErrorDivs();
             
             // Clear any existing errors first
             clearAllErrors();
@@ -1513,10 +1600,31 @@
             // Wait a moment, then show test errors
             setTimeout(() => {
                 console.log('Showing test errors...');
-                showFieldError('firstName', '🔴 TEST ERROR: First name field - This should be visible on the page!');
-                showFieldError('email', '🔴 TEST ERROR: Email field - This should be visible on the page!');
-                showFieldError('phone', '🔴 TEST ERROR: Phone field - This should be visible on the page!');
-                showFieldError('subjects', '🔴 TEST ERROR: Subjects field - This should be visible on the page!');
+                
+                // Test each field individually with detailed logging
+                const testFields = [
+                    { id: 'firstName', message: '🔴 TEST: First name error - You should see this RED BOX!' },
+                    { id: 'email', message: '🔴 TEST: Email error - You should see this RED BOX!' },
+                    { id: 'phone', message: '🔴 TEST: Phone error - You should see this RED BOX!' },
+                    { id: 'subjects', message: '🔴 TEST: Subjects error - You should see this RED BOX!' }
+                ];
+                
+                testFields.forEach(field => {
+                    console.log(`Testing field: ${field.id}`);
+                    showFieldError(field.id, field.message);
+                    
+                    // Verify the error div exists and is visible
+                    const errorDiv = document.getElementById(field.id + '-error');
+                    if (errorDiv) {
+                        console.log(`${field.id} error div:`, {
+                            display: errorDiv.style.display,
+                            visibility: errorDiv.style.visibility,
+                            opacity: errorDiv.style.opacity,
+                            offsetHeight: errorDiv.offsetHeight,
+                            classList: errorDiv.classList.toString()
+                        });
+                    }
+                });
                 
                 // Test validation summary
                 const validationSummary = document.getElementById('validationSummary');
@@ -1526,17 +1634,23 @@
                     validationList.innerHTML = '<li>🔴 Test error 1 - This should be visible</li><li>🔴 Test error 2 - In the yellow box at top</li><li>🔴 Test error 3 - With bullet points</li>';
                     validationSummary.classList.add('show');
                     validationSummary.style.display = 'block';
+                    validationSummary.style.visibility = 'visible';
+                    validationSummary.style.opacity = '1';
                     validationSummary.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     console.log('✅ Validation summary shown');
                 } else {
                     console.log('❌ Validation summary elements not found');
                 }
                 
-                // Alert user to look for errors
-                alert('🧪 TEST ERRORS DISPLAYED!\n\nLook for:\n• Red boxes under form fields\n• Yellow warning box at top\n• Check browser console for details');
+                // Count visible errors
+                const visibleErrors = document.querySelectorAll('.error-message.show');
+                const visibleSummary = document.querySelector('.validation-summary.show');
                 
-                console.log('✅ Test validation complete. Look for red error boxes on the page!');
-            }, 100);
+                // Alert user to look for errors
+                alert(`🧪 TEST COMPLETE!\n\nShould see:\n• ${visibleErrors.length} red error boxes under form fields\n• ${visibleSummary ? '1' : '0'} yellow warning box at top\n\nIf you don't see red boxes, check browser console for details.`);
+                
+                console.log(`✅ Test complete. Found ${visibleErrors.length} visible error messages.`);
+            }, 200);
         }
 
         document.getElementById('registrationForm').addEventListener('submit', async function(e) {
