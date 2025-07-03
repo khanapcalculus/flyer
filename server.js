@@ -364,15 +364,17 @@ app.post('/api/register', async (req, res) => {
       validationErrors.push('Please provide a valid email address (e.g., john@example.com)');
     }
     
-    // Phone validation - digits only, at least 10 digits
+    // Phone validation - digits only (no international codes), 10-15 digits
     if (!phone) {
       validationErrors.push('Please provide a phone number');
     } else {
       const phoneDigits = phone.replace(/\D/g, ''); // Remove all non-digits
-      if (phoneDigits.length < 10) {
-        validationErrors.push('Phone number must have at least 10 digits');
+      if (phoneDigits !== phone) {
+        validationErrors.push('Phone number must contain digits only (no letters or symbols)');
+      } else if (phoneDigits.length < 10) {
+        validationErrors.push(`Phone number too short (${phoneDigits.length} digits). Need at least 10 digits`);
       } else if (phoneDigits.length > 15) {
-        validationErrors.push('Phone number cannot exceed 15 digits');
+        validationErrors.push(`Phone number too long (${phoneDigits.length} digits). Maximum 15 digits allowed`);
       }
     }
     

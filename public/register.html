@@ -580,17 +580,6 @@
 
             <div id="alertContainer"></div>
             
-            <!-- Debug Test Buttons (remove in production) -->
-            <div id="debugButtons" style="margin: 20px 0; padding: 15px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px;">
-                <h4 style="margin: 0 0 10px 0; color: #6c757d;">🔧 Debug Tools (for testing error display)</h4>
-                <button type="button" onclick="testModal()" style="margin: 5px; padding: 8px 15px; background: #ffc107; border: none; border-radius: 3px; cursor: pointer;">Test Warning Modal</button>
-                <button type="button" onclick="testValidationResponse()" style="margin: 5px; padding: 8px 15px; background: #17a2b8; border: none; border-radius: 3px; cursor: pointer;">Test Validation Response</button>
-                <button type="button" onclick="testEmailPhoneErrors()" style="margin: 5px; padding: 8px 15px; background: #28a745; color: white; border: none; border-radius: 3px; cursor: pointer;">📧📱 Test Email/Phone Errors</button>
-                <button type="button" onclick="testInvalidSubmission()" style="margin: 5px; padding: 8px 15px; background: #dc3545; color: white; border: none; border-radius: 3px; cursor: pointer;">Test All Form Errors</button>
-                <button type="button" onclick="debugErrorDivs()" style="margin: 5px; padding: 8px 15px; background: #6c757d; color: white; border: none; border-radius: 3px; cursor: pointer;">Check Error Divs</button>
-                <p style="margin: 10px 0 0 0; font-size: 12px; color: #6c757d;">📧📱 <strong>New:</strong> Focus on Email/Phone validation only. Use "Test Email/Phone Errors" to test the streamlined validation.</p>
-            </div>
-            
             <!-- Validation Summary -->
             <div id="validationSummary" class="validation-summary">
                 <h4><i class="fas fa-exclamation-triangle"></i> Please fix the following issues:</h4>
@@ -647,14 +636,14 @@
                         </div>
                         <div class="form-group">
                             <label for="phone">Phone Number <span class="required">*</span></label>
-                            <input type="tel" id="phone" name="phone" class="form-control" placeholder="e.g., 7144008283 or +17144008283" required 
-                                   maxlength="20" 
-                                   onkeypress="return isDigitOrPlus(event)"
-                                   oninput="formatPhoneNumber(this)"
+                            <input type="tel" id="phone" name="phone" class="form-control" placeholder="e.g., 7144008283" required 
+                                   maxlength="15" 
+                                   onkeypress="return isDigitOnly(event)"
+                                   oninput="formatPhoneDigits(this)"
                                    onpaste="handlePhonePaste(event)">
                             <div class="error-message" id="phone-error"></div>
                             <div class="field-helper" style="font-size: 12px; color: #666; margin-top: 5px;">
-                                📱 Enter digits only. Include country code if international (e.g., +1 for US/Canada)
+                                📱 Enter digits only (10-15 digits)
                             </div>
                         </div>
                     </div>
@@ -1564,17 +1553,21 @@
             // Phone number validation (digits only, 10-15 digits)
             const phone = document.getElementById('phone').value.trim();
             if (!phone) {
-                showFieldError('phone', '❌ Phone number is required. Enter digits only (e.g., "7144008283" or "+17144008283").');
+                showFieldError('phone', '❌ Phone number is required. Enter digits only (e.g., "7144008283").');
                 errors.push('Enter your phone number');
                 if (!firstErrorField) firstErrorField = 'phone';
             } else {
                 const phoneDigits = phone.replace(/\D/g, ''); // Remove all non-digits
-                if (phoneDigits.length < 10) {
-                    showFieldError('phone', `❌ Phone number too short. You entered ${phoneDigits.length} digits, need at least 10.`);
+                if (phoneDigits !== phone) {
+                    showFieldError('phone', '❌ Phone number must contain digits only (no letters or symbols).');
+                    errors.push('Phone number must be digits only');
+                    if (!firstErrorField) firstErrorField = 'phone';
+                } else if (phone.length < 10) {
+                    showFieldError('phone', `❌ Phone number too short. You entered ${phone.length} digits, need at least 10.`);
                     errors.push('Phone number needs at least 10 digits');
                     if (!firstErrorField) firstErrorField = 'phone';
-                } else if (phoneDigits.length > 15) {
-                    showFieldError('phone', `❌ Phone number too long. You entered ${phoneDigits.length} digits, maximum is 15.`);
+                } else if (phone.length > 15) {
+                    showFieldError('phone', `❌ Phone number too long. You entered ${phone.length} digits, maximum is 15.`);
                     errors.push('Phone number too long (max 15 digits)');
                     if (!firstErrorField) firstErrorField = 'phone';
                 } else {
@@ -1648,146 +1641,15 @@
             return true;
         }
 
-        // Debug function to check all error divs
-        function debugErrorDivs() {
-            const errorDivIds = ['firstName-error', 'lastName-error', 'email-error', 'phone-error', 'grade-error', 'country-error', 'timezone-error', 'subjects-error'];
-            
-            console.log('🔍 CHECKING ERROR DIVS...');
-            errorDivIds.forEach(id => {
-                const div = document.getElementById(id);
-                console.log(`${id}:`, div ? '✅ Found' : '❌ Missing');
-                if (div) {
-                    console.log(`  - Display: ${div.style.display || 'default'}`);
-                    console.log(`  - Classes: ${div.className}`);
-                }
-            });
-        }
 
-        // Debug function to test modal display
-        function testModal() {
-            console.log('🧪 TESTING MODAL DISPLAY...');
-            
-            // Test warning modal first
-            showModal(
-                'warning',
-                'Test Validation Warning ⚠️',
-                `<strong>We found some issues that need your attention:</strong><br><br>
-                <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px; padding: 15px; margin: 10px 0;">
-                    <ul style="margin: 0; padding-left: 20px; text-align: left;">
-                        <li style="margin: 5px 0;">First name must be at least 2 characters long</li>
-                        <li style="margin: 5px 0;">Please provide a valid email address</li>
-                        <li style="margin: 5px 0;">Please select at least one subject</li>
-                    </ul>
-                </div>
-                <strong>What to do next:</strong><br>
-                • Review the issues listed above<br>
-                • Make the necessary corrections in the form<br>
-                • Click "Submit Registration" again<br><br>
-                This is a test of the validation error display system.`
-            );
-        }
-        
-        // Test function to simulate server validation response
-        function testValidationResponse() {
-            console.log('🧪 TESTING VALIDATION RESPONSE HANDLING...');
-            
-            const mockErrorData = {
-                success: false,
-                message: 'Please correct the following issues and try again:',
-                errors: [
-                    'First name must be at least 2 characters long',
-                    'Please provide a valid email address',
-                    'Please select at least one subject you need help with'
-                ],
-                type: 'validation'
-            };
-            
-            console.log('📝 Mock error data:', mockErrorData);
-            
-            // Simulate the validation error handling
-            const errorList = mockErrorData.errors || [];
-            const errorListHtml = errorList.map(error => `<li style="margin: 5px 0;">${error}</li>`).join('');
-            
-            console.log('📝 Generated error list HTML:', errorListHtml);
-            
-            showModal(
-                'warning',
-                'Please Check Your Information ⚠️',
-                `<strong>We found some issues that need your attention:</strong><br><br>
-                <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px; padding: 15px; margin: 10px 0;">
-                    <ul style="margin: 0; padding-left: 20px; text-align: left;">
-                        ${errorListHtml}
-                    </ul>
-                </div>
-                <strong>What to do next:</strong><br>
-                • Review the issues listed above<br>
-                • Make the necessary corrections in the form<br>
-                • Click "Submit Registration" again<br><br>
-                <strong>Need help?</strong> Contact us:<br>
-                📧 khan.apcalculus@gmail.com<br>
-                📱 714-400-8283`
-            );
-        }
-        
-        // Test function to submit invalid data
-        function testInvalidSubmission() {
-            console.log('🧪 TESTING INVALID FORM SUBMISSION...');
-            
-            // Fill form with invalid data focusing on email and phone
-            document.getElementById('firstName').value = '';
-            document.getElementById('lastName').value = '';
-            document.getElementById('email').value = 'invalid-email';  // Invalid email format
-            document.getElementById('phone').value = '123abc';        // Invalid phone (will be cleaned but too short)
-            document.getElementById('grade').value = '';
-            
-            // Uncheck all subjects
-            const subjectCheckboxes = document.querySelectorAll('input[name="subjects"]');
-            subjectCheckboxes.forEach(cb => cb.checked = false);
-            
-            console.log('📝 Form filled with invalid data (focusing on email/phone), triggering submission...');
-            
-            // Trigger form submission
-            const form = document.getElementById('registrationForm');
-            const event = new Event('submit', { bubbles: true, cancelable: true });
-            form.dispatchEvent(event);
-        }
-        
-        // Test function to fill form with only email/phone errors
-        function testEmailPhoneErrors() {
-            console.log('🧪 TESTING EMAIL AND PHONE VALIDATION...');
-            
-            // Fill basic required fields correctly
-            document.getElementById('firstName').value = 'John';
-            document.getElementById('lastName').value = 'Doe';
-            document.getElementById('grade').value = '10th';
-            
-            // Check at least one subject
-            const firstSubject = document.querySelector('input[name="subjects"]');
-            if (firstSubject) firstSubject.checked = true;
-            
-            // Add invalid email and phone
-            document.getElementById('email').value = 'invalid@';        // Invalid email
-            document.getElementById('phone').value = '123';            // Too short phone
-            
-            console.log('📝 Testing focused email/phone validation...');
-            
-            // Trigger form submission
-            const form = document.getElementById('registrationForm');
-            const event = new Event('submit', { bubbles: true, cancelable: true });
-            form.dispatchEvent(event);
-        }
 
-        // Phone number formatting functions
-        function isDigitOrPlus(event) {
+
+
+        // Phone number formatting functions - digits only
+        function isDigitOnly(event) {
             const char = String.fromCharCode(event.which);
-            const input = event.target;
             
-            // Allow plus only at the beginning
-            if (char === '+' && input.value.length === 0) {
-                return true;
-            }
-            
-            // Allow digits 0-9
+            // Allow digits 0-9 only
             if (/[0-9]/.test(char)) {
                 return true;
             }
@@ -1807,38 +1669,39 @@
             return false;
         }
         
-        function formatPhoneNumber(input) {
-            // Remove all non-digit characters except +
-            let value = input.value.replace(/[^\d+]/g, '');
+        function formatPhoneDigits(input) {
+            // Remove all non-digit characters
+            let value = input.value.replace(/\D/g, '');
             
-            // Ensure + only appears at the beginning
-            if (value.indexOf('+') > 0) {
-                value = value.replace(/\+/g, '');
-            }
-            
-            // Limit length
-            if (value.length > 20) {
-                value = value.substring(0, 20);
+            // Limit length to 15 digits
+            if (value.length > 15) {
+                value = value.substring(0, 15);
             }
             
             input.value = value;
             
             // Update visual feedback
-            const phoneDigits = value.replace(/\D/g, '');
             const phoneError = document.getElementById('phone-error');
             
-            if (phoneDigits.length > 0 && phoneDigits.length < 10) {
+            if (value.length > 0 && value.length < 10) {
                 input.style.borderColor = '#ffc107'; // Warning color
                 if (phoneError) {
-                    phoneError.textContent = `${phoneDigits.length}/10 digits minimum`;
+                    phoneError.textContent = `${value.length}/10 digits minimum`;
                     phoneError.style.color = '#856404';
                     phoneError.style.display = 'block';
                 }
-            } else if (phoneDigits.length >= 10) {
+            } else if (value.length >= 10 && value.length <= 15) {
                 input.style.borderColor = '#28a745'; // Success color
                 if (phoneError) {
                     phoneError.textContent = '';
                     phoneError.style.display = 'none';
+                }
+            } else if (value.length > 15) {
+                input.style.borderColor = '#dc3545'; // Error color
+                if (phoneError) {
+                    phoneError.textContent = 'Maximum 15 digits allowed';
+                    phoneError.style.color = '#dc3545';
+                    phoneError.style.display = 'block';
                 }
             } else {
                 input.style.borderColor = '';
@@ -1850,85 +1713,13 @@
         }
         
         function handlePhonePaste(event) {
-            // Allow paste but clean it up
+            // Allow paste but clean it up to digits only
             setTimeout(() => {
-                formatPhoneNumber(event.target);
+                formatPhoneDigits(event.target);
             }, 0);
         }
 
-        // Add to window for console access
-        window.testModal = testModal;
-        window.testValidationResponse = testValidationResponse;
-        window.testInvalidSubmission = testInvalidSubmission;
-        window.testEmailPhoneErrors = testEmailPhoneErrors;
-        window.debugErrorDivs = debugErrorDivs;
-        window.testValidation = testValidation;
 
-        // Test function to check if error display is working
-        function testValidation() {
-            console.log('🧪 TESTING VALIDATION DISPLAY...');
-            
-            // First check if all error divs exist
-            debugErrorDivs();
-            
-            // Clear any existing errors first
-            clearAllErrors();
-            
-            // Wait a moment, then show test errors
-            setTimeout(() => {
-                console.log('Showing test errors...');
-                
-                // Test each field individually with detailed logging
-                const testFields = [
-                    { id: 'firstName', message: '🔴 TEST: First name error - You should see this RED BOX!' },
-                    { id: 'email', message: '🔴 TEST: Email error - You should see this RED BOX!' },
-                    { id: 'phone', message: '🔴 TEST: Phone error - You should see this RED BOX!' },
-                    { id: 'subjects', message: '🔴 TEST: Subjects error - You should see this RED BOX!' }
-                ];
-                
-                testFields.forEach(field => {
-                    console.log(`Testing field: ${field.id}`);
-                    showFieldError(field.id, field.message);
-                    
-                    // Verify the error div exists and is visible
-                    const errorDiv = document.getElementById(field.id + '-error');
-                    if (errorDiv) {
-                        console.log(`${field.id} error div:`, {
-                            display: errorDiv.style.display,
-                            visibility: errorDiv.style.visibility,
-                            opacity: errorDiv.style.opacity,
-                            offsetHeight: errorDiv.offsetHeight,
-                            classList: errorDiv.classList.toString()
-                        });
-                    }
-                });
-                
-                // Test validation summary
-                const validationSummary = document.getElementById('validationSummary');
-                const validationList = document.getElementById('validationList');
-                
-                if (validationSummary && validationList) {
-                    validationList.innerHTML = '<li>🔴 Test error 1 - This should be visible</li><li>🔴 Test error 2 - In the yellow box at top</li><li>🔴 Test error 3 - With bullet points</li>';
-                    validationSummary.classList.add('show');
-                    validationSummary.style.display = 'block';
-                    validationSummary.style.visibility = 'visible';
-                    validationSummary.style.opacity = '1';
-                    validationSummary.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    console.log('✅ Validation summary shown');
-                } else {
-                    console.log('❌ Validation summary elements not found');
-                }
-                
-                // Count visible errors
-                const visibleErrors = document.querySelectorAll('.error-message.show');
-                const visibleSummary = document.querySelector('.validation-summary.show');
-                
-                // Alert user to look for errors
-                alert(`🧪 TEST COMPLETE!\n\nShould see:\n• ${visibleErrors.length} red error boxes under form fields\n• ${visibleSummary ? '1' : '0'} yellow warning box at top\n\nIf you don't see red boxes, check browser console for details.`);
-                
-                console.log(`✅ Test complete. Found ${visibleErrors.length} visible error messages.`);
-            }, 200);
-        }
 
         document.getElementById('registrationForm').addEventListener('submit', async function(e) {
             e.preventDefault();
