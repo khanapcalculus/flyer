@@ -498,17 +498,16 @@
             position: absolute;
             right: 15px;
             top: 15px;
-            color: #aaa;
-            font-size: 28px;
+            font-size: 24px;
             font-weight: bold;
+            color: #666;
             cursor: pointer;
+            transition: color 0.3s ease;
             z-index: 1;
         }
 
-        .close:hover,
-        .close:focus {
-            color: #000;
-            text-decoration: none;
+        .close:hover {
+            color: #333;
         }
 
         .alert-error {
@@ -968,6 +967,20 @@
                     🧪 CLICK HERE TO TEST ERROR DISPLAY
                 </button>
             </form>
+        </div>
+    </div>
+
+    <!-- Modal Dialog -->
+    <div id="modal" class="modal">
+        <div id="modalContent" class="modal-content">
+            <span class="close">&times;</span>
+            <div id="modalHeader" class="modal-header">
+                <h2 id="modalTitle" class="modal-title"></h2>
+            </div>
+            <div id="modalBody" class="modal-body"></div>
+            <div class="modal-footer">
+                <button id="modalBtn" class="modal-btn">OK</button>
+            </div>
         </div>
     </div>
 
