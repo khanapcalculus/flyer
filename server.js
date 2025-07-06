@@ -58,7 +58,18 @@ mongoose.connect(MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
-.then(() => console.log('✅ Connected to MongoDB'))
+.then(async () => {
+  console.log('✅ Connected to MongoDB');
+  // Drop the unique index on email if it exists
+  try {
+    await mongoose.connection.db.collection('students').dropIndex('email_1');
+    console.log('✅ Dropped unique email index');
+  } catch (error) {
+    if (error.code !== 27) { // 27 is the error code when index doesn't exist
+      console.error('❌ Error dropping index:', error);
+    }
+  }
+})
 .catch(err => {
   console.error('❌ MongoDB connection error:', err);
   console.log('Connection string being used:', MONGODB_URI);
@@ -308,25 +319,33 @@ app.post('/api/register', async (req, res) => {
 
     // No validation - accept all input directly
 
-    // Create new student without validation
-    const newStudent = new Student({
-      firstName,
-      lastName,
-      email,
-      phone,
-      grade,
-      country,
-      timezone,
-      subjects,
-      preferredTimes,
-      parentName,
-      parentEmail,
-      parentPhone,
-      goals,
-      experience
-    });
+    // Update existing student or create new one
+    const newStudent = await Student.findOneAndUpdate(
+      { email }, // find by email
+      { // update or create with these fields
+        firstName,
+        lastName,
+        email,
+        phone,
+        grade,
+        country,
+        timezone,
+        subjects,
+        preferredTimes,
+        parentName,
+        parentEmail,
+        parentPhone,
+        goals,
+        experience,
+        status: 'pending'
+      },
+      {
+        new: true, // return the updated document
+        upsert: true, // create if doesn't exist
+        setDefaultsOnInsert: true // apply schema defaults if creating new doc
+      }
+    );
 
-    await newStudent.save();
     console.log('✅ Student saved to database successfully');
 
     // Generate AI-powered personalized content (with fallback)
