@@ -369,129 +369,94 @@
         .modal {
             display: none;
             position: fixed;
-            z-index: 9999;
+            z-index: 1000;
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(5px);
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s ease-out;
         }
 
         .modal-content {
-            background: white;
+            position: relative;
+            background-color: #fefefe;
             margin: 10% auto;
             padding: 0;
-            border-radius: 15px;
-            width: 90%;
+            border: none;
+            width: 80%;
             max-width: 500px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            animation: modalSlideIn 0.4s ease-out;
-            position: relative;
-            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease-out;
         }
 
-        @keyframes modalSlideIn {
-            from { 
-                opacity: 0; 
-                transform: translateY(-50px) scale(0.8); 
-            }
-            to { 
-                opacity: 1; 
-                transform: translateY(0) scale(1); 
-            }
+        @keyframes slideIn {
+            from { transform: translateY(-100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
         .modal-header {
-            padding: 25px 25px 0 25px;
-            text-align: center;
+            padding: 20px 25px;
+            background: #f8f9fa;
+            border-radius: 12px 12px 0 0;
+            border-bottom: 1px solid #dee2e6;
         }
 
         .modal-header.success {
-            background: linear-gradient(135deg, #d4f6da 0%, #c3e6cb 100%);
+            background: #d4edda;
             color: #155724;
         }
 
-        .modal-header.warning {
-            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
-            color: #856404;
-        }
-
         .modal-header.error {
-            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            background: #f8d7da;
             color: #721c24;
         }
 
-        .modal-icon {
-            font-size: 4rem;
-            margin-bottom: 15px;
-            animation: iconBounce 0.6s ease-out 0.2s both;
-        }
-
-        @keyframes iconBounce {
-            0% { transform: scale(0); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-
         .modal-title {
-            font-size: 1.8rem;
+            margin: 0;
+            font-size: 1.25rem;
             font-weight: 600;
-            margin: 0 0 10px 0;
         }
 
         .modal-body {
-            padding: 20px 25px;
-            text-align: center;
-        }
-
-        .modal-message {
-            font-size: 16px;
+            padding: 25px;
+            font-size: 1rem;
             line-height: 1.5;
-            margin-bottom: 25px;
-        }
-
-        .modal-footer {
-            padding: 0 25px 25px 25px;
-            text-align: center;
-        }
-
-        .modal-btn {
-            background: #002147;
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 25px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            min-width: 120px;
-        }
-
-        .modal-btn:hover {
-            background: #003366;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 33, 71, 0.4);
-        }
-
-        .modal-btn.warning {
-            background: #ffc107;
             color: #212529;
         }
 
-        .modal-btn.warning:hover {
-            background: #e0a800;
-            box-shadow: 0 8px 25px rgba(255, 193, 7, 0.4);
+        .modal-footer {
+            padding: 15px 25px 25px;
+            text-align: right;
+        }
+
+        .modal-btn {
+            padding: 10px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .modal-btn.success {
+            background: #28a745;
+            color: white;
+        }
+
+        .modal-btn.success:hover {
+            background: #218838;
         }
 
         .modal-btn.error {
             background: #dc3545;
+            color: white;
         }
 
         .modal-btn.error:hover {
             background: #c82333;
-            box-shadow: 0 8px 25px rgba(220, 53, 69, 0.4);
         }
 
         .close {
@@ -502,12 +467,13 @@
             font-weight: bold;
             color: #666;
             cursor: pointer;
-            transition: color 0.3s ease;
-            z-index: 1;
+            transition: color 0.2s ease;
+            padding: 5px;
+            line-height: 1;
         }
 
         .close:hover {
-            color: #333;
+            color: #000;
         }
 
         .alert-error {
@@ -999,27 +965,28 @@
             modalBody.innerHTML = message;
             modalBtn.className = 'modal-btn ' + type;
             
-            modal.style.display = 'block';
-            
-            // Close button functionality
-            document.querySelector('.close').onclick = function() {
+            // Add click event handlers for closing the modal
+            const closeModal = () => {
                 modal.style.display = 'none';
-                if (onClose) onClose();
-            };
-            
-            // Close on modal button click
-            modalBtn.onclick = function() {
-                modal.style.display = 'none';
-                if (onClose) onClose();
-            };
-            
-            // Close on clicking outside
-            window.onclick = function(event) {
-                if (event.target == modal) {
-                    modal.style.display = 'none';
-                    if (onClose) onClose();
+                if (typeof onClose === 'function') {
+                    onClose();
                 }
             };
+
+            // Close when clicking the X button
+            document.querySelector('.close').onclick = closeModal;
+            
+            // Close when clicking the OK button
+            modalBtn.onclick = closeModal;
+            
+            // Close when clicking outside the modal
+            window.onclick = (event) => {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            };
+            
+            modal.style.display = 'block';
         }
 
         // Country to timezone mapping
