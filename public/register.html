@@ -369,94 +369,129 @@
         .modal {
             display: none;
             position: fixed;
-            z-index: 1000;
+            z-index: 9999;
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            animation: fadeIn 0.3s ease-out;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
         }
 
         .modal-content {
-            position: relative;
-            background-color: #fefefe;
+            background: white;
             margin: 10% auto;
             padding: 0;
-            border: none;
-            width: 80%;
+            border-radius: 15px;
+            width: 90%;
             max-width: 500px;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            animation: slideIn 0.3s ease-out;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.4s ease-out;
+            position: relative;
+            overflow: hidden;
         }
 
-        @keyframes slideIn {
-            from { transform: translateY(-100px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+        @keyframes modalSlideIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(-50px) scale(0.8); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
         }
 
         .modal-header {
-            padding: 20px 25px;
-            background: #f8f9fa;
-            border-radius: 12px 12px 0 0;
-            border-bottom: 1px solid #dee2e6;
+            padding: 25px 25px 0 25px;
+            text-align: center;
         }
 
         .modal-header.success {
-            background: #d4edda;
+            background: linear-gradient(135deg, #d4f6da 0%, #c3e6cb 100%);
             color: #155724;
         }
 
+        .modal-header.warning {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            color: #856404;
+        }
+
         .modal-header.error {
-            background: #f8d7da;
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
             color: #721c24;
         }
 
+        .modal-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            animation: iconBounce 0.6s ease-out 0.2s both;
+        }
+
+        @keyframes iconBounce {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
         .modal-title {
-            margin: 0;
-            font-size: 1.25rem;
+            font-size: 1.8rem;
             font-weight: 600;
+            margin: 0 0 10px 0;
         }
 
         .modal-body {
-            padding: 25px;
-            font-size: 1rem;
+            padding: 20px 25px;
+            text-align: center;
+        }
+
+        .modal-message {
+            font-size: 16px;
             line-height: 1.5;
-            color: #212529;
+            margin-bottom: 25px;
         }
 
         .modal-footer {
-            padding: 15px 25px 25px;
-            text-align: right;
+            padding: 0 25px 25px 25px;
+            text-align: center;
         }
 
         .modal-btn {
-            padding: 10px 24px;
-            font-size: 1rem;
-            font-weight: 600;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .modal-btn.success {
-            background: #28a745;
+            background: #002147;
             color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
         }
 
-        .modal-btn.success:hover {
-            background: #218838;
+        .modal-btn:hover {
+            background: #003366;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 33, 71, 0.4);
+        }
+
+        .modal-btn.warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .modal-btn.warning:hover {
+            background: #e0a800;
+            box-shadow: 0 8px 25px rgba(255, 193, 7, 0.4);
         }
 
         .modal-btn.error {
             background: #dc3545;
-            color: white;
         }
 
         .modal-btn.error:hover {
             background: #c82333;
+            box-shadow: 0 8px 25px rgba(220, 53, 69, 0.4);
         }
 
         .close {
@@ -467,63 +502,30 @@
             font-weight: bold;
             color: #666;
             cursor: pointer;
-            transition: color 0.2s ease;
-            padding: 5px;
-            line-height: 1;
+            transition: color 0.3s ease;
+            z-index: 1;
         }
 
         .close:hover {
-            color: #000;
-        }
-
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-            box-shadow: 0 8px 32px rgba(114, 28, 36, 0.2);
-        }
-
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #f093fb;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            color: #333;
         }
 
         @media (max-width: 768px) {
-            .header h1 {
-                font-size: 2rem;
-            }
-            
-            .form-container {
-                padding: 20px 20px 40px 20px;
-            }
-            
-            .day-time-row {
-                grid-template-columns: 1fr;
-                gap: 10px;
-            }
-            
-            .day-checkbox {
-                justify-content: center;
+            .modal-content {
+                width: 95%;
+                margin: 5% auto;
             }
 
-            body {
-                padding: 15px 15px 80px 15px;
+            .modal-title {
+                font-size: 1.5rem;
+            }
+
+            .modal-body {
+                padding: 15px 20px;
+            }
+
+            .modal-footer {
+                padding: 0 20px 20px 20px;
             }
         }
     </style>
@@ -557,16 +559,13 @@
             </div>
 
             <!-- Modal Dialog -->
-            <div id="responseModal" class="modal">
-                <div class="modal-content">
+            <div id="modal" class="modal">
+                <div id="modalContent" class="modal-content">
                     <span class="close">&times;</span>
                     <div id="modalHeader" class="modal-header">
-                        <div id="modalIcon" class="modal-icon"></div>
                         <h2 id="modalTitle" class="modal-title"></h2>
                     </div>
-                    <div class="modal-body">
-                        <p id="modalMessage" class="modal-message"></p>
-                    </div>
+                    <div id="modalBody" class="modal-body"></div>
                     <div class="modal-footer">
                         <button id="modalBtn" class="modal-btn">OK</button>
                     </div>
@@ -936,20 +935,6 @@
         </div>
     </div>
 
-    <!-- Modal Dialog -->
-    <div id="modal" class="modal">
-        <div id="modalContent" class="modal-content">
-            <span class="close">&times;</span>
-            <div id="modalHeader" class="modal-header">
-                <h2 id="modalTitle" class="modal-title"></h2>
-            </div>
-            <div id="modalBody" class="modal-body"></div>
-            <div class="modal-footer">
-                <button id="modalBtn" class="modal-btn">OK</button>
-            </div>
-        </div>
-    </div>
-
     <script>
         // Modal functions
         function showModal(type, title, message, onClose) {
@@ -960,27 +945,40 @@
             const modalBody = document.getElementById('modalBody');
             const modalBtn = document.getElementById('modalBtn');
             
+            // Remove any existing event listeners
+            const closeBtn = document.querySelector('.close');
+            const oldCloseBtn = closeBtn.cloneNode(true);
+            closeBtn.parentNode.replaceChild(oldCloseBtn, closeBtn);
+            
+            const oldModalBtn = modalBtn.cloneNode(true);
+            modalBtn.parentNode.replaceChild(oldModalBtn, modalBtn);
+            
+            // Update modal content
             modalHeader.className = 'modal-header ' + type;
             modalTitle.textContent = title;
             modalBody.innerHTML = message;
-            modalBtn.className = 'modal-btn ' + type;
+            oldModalBtn.className = 'modal-btn ' + type;
+            
+            // Store the onClose callback
+            modal._onClose = onClose;
             
             // Add click event handlers for closing the modal
             const closeModal = () => {
                 modal.style.display = 'none';
-                if (typeof onClose === 'function') {
-                    onClose();
+                if (modal._onClose && typeof modal._onClose === 'function') {
+                    modal._onClose();
+                    modal._onClose = null; // Clear the callback after use
                 }
             };
 
             // Close when clicking the X button
-            document.querySelector('.close').onclick = closeModal;
+            oldCloseBtn.onclick = closeModal;
             
             // Close when clicking the OK button
-            modalBtn.onclick = closeModal;
+            oldModalBtn.onclick = closeModal;
             
             // Close when clicking outside the modal
-            window.onclick = (event) => {
+            modal.onclick = (event) => {
                 if (event.target === modal) {
                     closeModal();
                 }
@@ -1521,7 +1519,7 @@
             // Validate subjects
             const subjectCheckboxes = document.querySelectorAll('input[name="subjects"]:checked');
             if (subjectCheckboxes.length === 0) {
-                showFieldError('subjects', '❌ At least one subject is required. Please check the boxes for subjects you need help with (e.g., Algebra, Calculus, etc.).');
+                showFieldError('subjects', '❌ At least one subject is required. Please check the boxes for subjects you need help with.');
                 errors.push('Select at least one subject you need help with');
                 if (!firstErrorField) firstErrorField = 'subjects';
             } else {
@@ -1549,163 +1547,48 @@
                 }
             }
 
-            // Show validation summary if there are errors
             if (errors.length > 0) {
-                const validationSummary = document.getElementById('validationSummary');
-                const validationList = document.getElementById('validationList');
-                
-                validationList.innerHTML = '';
-                errors.forEach(error => {
-                    const li = document.createElement('li');
-                    li.textContent = error;
-                    validationList.appendChild(li);
-                });
-                
-                validationSummary.classList.add('show');
-                validationSummary.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                
-                // Focus on first error field
-                if (firstErrorField) {
-                    setTimeout(() => {
-                        document.getElementById(firstErrorField).focus();
-                    }, 300);
-                }
-                
-                return false;
-            }
-
-            return true;
-        }
-
-
-
-
-
-        // Phone number formatting functions - digits only
-        function isDigitOnly(event) {
-            const char = String.fromCharCode(event.which);
-            
-            // Allow digits 0-9 only
-            if (/[0-9]/.test(char)) {
-                return true;
-            }
-            
-            // Allow backspace, delete, tab, escape, enter
-            if ([8, 9, 27, 13, 46].indexOf(event.keyCode) !== -1 ||
-                // Allow Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
-                (event.keyCode === 65 && event.ctrlKey === true) ||
-                (event.keyCode === 67 && event.ctrlKey === true) ||
-                (event.keyCode === 86 && event.ctrlKey === true) ||
-                (event.keyCode === 88 && event.ctrlKey === true)) {
-                return true;
-            }
-            
-            // Prevent all other characters
-            event.preventDefault();
-            return false;
-        }
-        
-        function formatPhoneDigits(input) {
-            // Remove all non-digit characters
-            let value = input.value.replace(/\D/g, '');
-            
-            // Limit length to 15 digits
-            if (value.length > 15) {
-                value = value.substring(0, 15);
-            }
-            
-            input.value = value;
-            
-            // Update visual feedback
-            const phoneError = document.getElementById('phone-error');
-            
-            if (value.length > 0 && value.length < 10) {
-                input.style.borderColor = '#ffc107'; // Warning color
-                if (phoneError) {
-                    phoneError.textContent = `${value.length}/10 digits minimum`;
-                    phoneError.style.color = '#856404';
-                    phoneError.style.display = 'block';
-                }
-            } else if (value.length >= 10 && value.length <= 15) {
-                input.style.borderColor = '#28a745'; // Success color
-                if (phoneError) {
-                    phoneError.textContent = '';
-                    phoneError.style.display = 'none';
-                }
-            } else if (value.length > 15) {
-                input.style.borderColor = '#dc3545'; // Error color
-                if (phoneError) {
-                    phoneError.textContent = 'Maximum 15 digits allowed';
-                    phoneError.style.color = '#dc3545';
-                    phoneError.style.display = 'block';
-                }
+                showModal('error', 'Registration Error ❌', `<strong>Unable to complete registration:</strong><br><br>
+                <div style="background: #ffebee; border: 1px solid #f44336; border-radius: 5px; padding: 15px; margin: 10px 0;">
+                    <strong>Server Issue:</strong> ${errors.join('<br><br>')}<br><br>
+                    <strong>What you can do:</strong><br>
+                    • Try submitting again in a few moments<br>
+                    • Contact us if the problem continues<br><br>
+                    📧 khan.apcalculus@gmail.com<br>
+                    📱 714-400-8283`, null);
             } else {
-                input.style.borderColor = '';
-                if (phoneError) {
-                    phoneError.textContent = '';
-                    phoneError.style.display = 'none';
-                }
+                // Handle successful form submission
+                console.log('Form validation passed. Submitting form...');
+                // Add your form submission logic here
             }
         }
-        
-        function handlePhonePaste(event) {
-            // Allow paste but clean it up to digits only
-            setTimeout(() => {
-                formatPhoneDigits(event.target);
-            }, 0);
+
+        // Test validation function
+        function testValidation() {
+            console.log('Testing validation...');
+            validateForm();
         }
 
-
-
+        // Form submission handler
         document.getElementById('registrationForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const submitBtn = document.getElementById('submitBtn');
-            const loadingIndicator = document.getElementById('loadingIndicator');
-            
-            // Show loading
             submitBtn.disabled = true;
-            loadingIndicator.style.display = 'block';
             
             try {
                 const formData = new FormData(this);
-                
-                // Get selected subjects
-                const subjects = [];
-                const subjectCheckboxes = document.querySelectorAll('input[name="subjects"]:checked');
-                subjectCheckboxes.forEach(checkbox => {
-                    subjects.push(checkbox.value);
-                });
-                
-                // Get preferred times from checkboxes
-                const preferredTimes = [];
-                const checkedDays = document.querySelectorAll('input[name="scheduleDay"]:checked');
-                
-                checkedDays.forEach(dayCheckbox => {
-                    const day = dayCheckbox.value;
-                    const dayLower = day.toLowerCase();
-                    const timeInput = document.querySelector(`input[name="${dayLower}Time"]`);
-                    const time = timeInput.value.trim();
-                    
-                    if (time) {
-                        preferredTimes.push({
-                            day: day,
-                            time: time
-                        });
-                    }
-                });
-                
-                // Prepare data for submission
                 const registrationData = {
                     firstName: formData.get('firstName'),
                     lastName: formData.get('lastName'),
                     email: formData.get('email'),
                     phone: formData.get('phone'),
                     grade: formData.get('grade'),
-                    country: formData.get('country'),
-                    timezone: formData.get('timezone'),
-                    subjects: subjects,
-                    preferredTimes: preferredTimes,
+                    subjects: Array.from(document.querySelectorAll('input[name="subjects"]:checked')).map(cb => cb.value),
+                    preferredTimes: Array.from(document.querySelectorAll('input[name="scheduleDay"]:checked')).map(cb => ({
+                        day: cb.value,
+                        time: document.querySelector(`input[name="${cb.value.toLowerCase()}Time"]`).value.trim()
+                    })).filter(pt => pt.time),
                     parentName: formData.get('parentName'),
                     parentEmail: formData.get('parentEmail'),
                     parentPhone: formData.get('parentPhone'),
@@ -1715,9 +1598,7 @@
                 
                 const response = await fetch('/api/register', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(registrationData)
                 });
                 
@@ -1775,9 +1656,8 @@
                 );
             } finally {
                 submitBtn.disabled = false;
-                loadingIndicator.style.display = 'none';
             }
         });
     </script>
 </body>
-</html> 
+</html>
