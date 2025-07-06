@@ -926,11 +926,6 @@
                 <button type="submit" class="btn btn-primary" id="submitBtn">
                     <i class="fas fa-paper-plane"></i> Submit Registration
                 </button>
-                
-                <!-- Test validation button (remove in production) -->
-                <button type="button" onclick="testValidation()" style="margin-top: 15px; width: 100%; padding: 15px; background: #ffc107; color: #000; border: 2px solid #ffb800; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;">
-                    🧪 CLICK HERE TO TEST ERROR DISPLAY
-                </button>
             </form>
         </div>
     </div>
@@ -1576,25 +1571,14 @@
             }
 
             if (errors.length > 0) {
-                showModal('error', 'Registration Error ❌', `<strong>Unable to complete registration:</strong><br><br>
+                showModal('error', 'Registration Error ❌', `<strong>Please fix the following:</strong><br><br>
                 <div style="background: #ffebee; border: 1px solid #f44336; border-radius: 5px; padding: 15px; margin: 10px 0;">
-                    <strong>Server Issue:</strong> ${errors.join('<br><br>')}<br><br>
-                    <strong>What you can do:</strong><br>
-                    • Try submitting again in a few moments<br>
-                    • Contact us if the problem continues<br><br>
-                    📧 khan.apcalculus@gmail.com<br>
-                    📱 714-400-8283`, null);
+                    ${errors.join('<br><br>')}
+                </div>`, null);
             } else {
                 // Handle successful form submission
                 console.log('Form validation passed. Submitting form...');
-                // Add your form submission logic here
             }
-        }
-
-        // Test validation function
-        function testValidation() {
-            console.log('Testing validation...');
-            validateForm();
         }
 
         // Form submission handler
