@@ -64,89 +64,23 @@ mongoose.connect(MONGODB_URI, {
   console.log('Connection string being used:', MONGODB_URI);
 });
 
-// Student Schema
+// Student Schema without validation
 const studentSchema = new mongoose.Schema({
-  firstName: {
-    type: String,
-    required: true,
-    trim: true,
-    maxlength: 50
-  },
-  lastName: {
-    type: String,
-    required: true,
-    trim: true,
-    maxlength: 50
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    lowercase: true,
-    validate: [validator.isEmail, 'Please provide a valid email']
-  },
-  phone: {
-    type: String,
-    required: true,
-    validate: {
-      validator: function(v) {
-        return /^\d{10,15}$/.test(v.replace(/[-()\s]/g, ''));
-      },
-      message: 'Please provide a valid phone number'
-    }
-  },
-  grade: {
-    type: String,
-    required: true,
-    enum: ['6th', '7th', '8th', '9th', '10th', '11th', '12th', 'College', 'Graduate']
-  },
-  country: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  timezone: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  subjects: [{
-    type: String,
-    enum: [
-      'Algebra', 'Geometry', 'Pre-Calculus', 'Calculus', 
-      'AP Calculus AB', 'AP Calculus BC', 'AP Statistics',
-      'Linear Algebra', 'Multivariable Calculus', 'Differential Equations',
-      'IB Math HL', 'IB Math SL', 
-      'Biology', 'AP Biology',
-      'Chemistry', 'AP Chemistry',
-      'Physics', 'AP Physics 1', 'AP Physics 2', 'AP Physics C (Mechanics)', 'AP Physics C (E&M)',
-      'English', 'AP English Language', 'AP English Literature'
-    ]
-  }],
+  firstName: String,
+  lastName: String,
+  email: String,
+  phone: String,
+  grade: String,
+  country: String,
+  timezone: String,
+  subjects: [String],
   preferredTimes: [{
     day: String,
     time: String
   }],
   parentName: String,
   parentEmail: String,
-  parentPhone: {
-    type: String,
-    validate: {
-      validator: function(v) {
-        if (!v) return true; // Optional field
-        const digits = v.replace(/\D/g, '');
-        return v === digits && digits.length >= 10 && digits.length <= 15;
-      },
-      message: props => {
-        if (!props.value) return 'Parent phone is optional';
-        const digits = props.value.replace(/\D/g, '');
-        if (props.value !== digits) return 'Parent phone must contain digits only';
-        if (digits.length < 10) return `Parent phone too short (${digits.length} digits). Need at least 10 digits`;
-        if (digits.length > 15) return `Parent phone too long (${digits.length} digits). Maximum 15 digits allowed`;
-        return 'Invalid parent phone number';
-      }
-    }
-  },
+  parentPhone: String,
   goals: String,
   experience: String,
   registrationDate: {
@@ -155,7 +89,6 @@ const studentSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['pending', 'active', 'inactive'],
     default: 'pending'
   }
 }, {
@@ -373,69 +306,13 @@ app.post('/api/register', async (req, res) => {
       goals, experience
     } = req.body;
 
-    // Focused validation - only validate critical fields: email and phone
-    const validationErrors = [];
-    
-    // Email validation - most critical
-    if (!email || !validator.isEmail(email)) {
-      validationErrors.push('Please provide a valid email address (e.g., john@example.com)');
-    }
-    
-    // Phone validation - digits only (no international codes), 10-15 digits
-    if (!phone) {
-      validationErrors.push('Please provide a phone number');
-    } else {
-      const phoneDigits = phone.replace(/\D/g, ''); // Remove all non-digits
-      if (phoneDigits !== phone) {
-        validationErrors.push('Phone number must contain digits only (no letters or symbols)');
-      } else if (phoneDigits.length < 10) {
-        validationErrors.push(`Phone number too short (${phoneDigits.length} digits). Need at least 10 digits`);
-      } else if (phoneDigits.length > 15) {
-        validationErrors.push(`Phone number too long (${phoneDigits.length} digits). Maximum 15 digits allowed`);
-      }
-    }
-    
-    // Basic required field checks (but less strict)
-    if (!firstName || firstName.trim().length === 0) {
-      validationErrors.push('First name is required');
-    }
-    
-    if (!lastName || lastName.trim().length === 0) {
-      validationErrors.push('Last name is required');
-    }
-    
-    if (!grade) {
-      validationErrors.push('Please select your grade level');
-    }
-    
-    if (!subjects || subjects.length === 0) {
-      validationErrors.push('Please select at least one subject you need help with');
-    }
-    
-    // Check if student already exists (if email is valid)
-    if (email && validator.isEmail(email)) {
-      const existingStudent = await Student.findOne({ email: email.toLowerCase() });
-      if (existingStudent) {
-        validationErrors.push('A student with this email address is already registered. Please use a different email or contact us if you need assistance.');
-      }
-    }
-    
-    // If there are validation errors, return them for user to fix
-    if (validationErrors.length > 0) {
-      console.log('⚠️ Validation errors found:', validationErrors);
-      return res.status(400).json({
-        success: false,
-        message: 'Please correct the following issues and try again:',
-        errors: validationErrors,
-        type: 'validation'
-      });
-    }
+    // No validation - accept all input directly
 
-    // Create new student
+    // Create new student without validation
     const newStudent = new Student({
       firstName,
       lastName,
-      email: email.toLowerCase(),
+      email,
       phone,
       grade,
       country,
